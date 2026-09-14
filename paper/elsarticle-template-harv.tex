@@ -1,0 +1,1287 @@
+%%
+%% Copyright 2007-2024 Elsevier Ltd
+%% 
+%% This file is part of the 'Elsarticle Bundle'.
+%% ---------------------------------------------
+%% 
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.3 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%% 
+%% The list of all files belonging to the 'Elsarticle Bundle' is
+%% given in the file `manifest.txt'.
+%% 
+%% Template article for Elsevier's document class `elsarticle'
+%% with harvard style bibliographic references
+
+\documentclass[preprint,12pt,authoryear]{elsarticle}
+
+%% Use the option review to obtain double line spacing
+%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times,authoryear]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn,authoryear]{elsarticle}
+%% \documentclass[final,3p,times,authoryear]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn,authoryear]{elsarticle}
+%% \documentclass[final,5p,times,authoryear]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn,authoryear]{elsarticle}
+
+%% For including figures, graphicx.sty has been loaded in
+%% elsarticle.cls. If you prefer to use the old commands
+%% please give \usepackage{epsfig}
+
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsmath package provides various useful equation environments.
+\usepackage{amsmath}
+%% The amsthm package provides extended theorem environments
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{caption}
+%\usepackage[label font=bf,labelformat=simple]{subfig}
+\usepackage{subcaption}
+\usepackage[colorlinks,linkcolor=blue,urlcolor=blue,anchorcolor=blue,citecolor=blue]{hyperref}
+\usepackage{bm}
+\usepackage{makecell}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage[left=2.3cm, right=2.3cm, top=2cm, bottom=2cm]{geometry}
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+  {% \begin{breakablealgorithm}
+   \begin{center}
+     \refstepcounter{algorithm}% New algorithm
+     \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+     \renewcommand{\caption}[2][\relax]{% Make a new \caption
+       {\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+       \ifx\relax##1\relax % #1 is \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+       \else % #1 is not \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+       \fi
+       \kern2pt\hrule\kern2pt
+     }
+  }{% \end{breakablealgorithm}
+     \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+   \end{center}
+  }
+\makeatother
+
+\newtheorem{proposition}{Proposition}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+%% \usepackage{lineno}
+
+\journal{Transportation Research Part B: Methodological}
+
+\begin{document}
+
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+%% use the tnoteref command within \title for footnotes;
+%% use the tnotetext command for theassociated footnote;
+%% use the fnref command within \author or \affiliation for footnotes;
+%% use the fntext command for theassociated footnote;
+%% use the corref command within \author for corresponding author footnotes;
+%% use the cortext command for theassociated footnote;
+%% use the ead command for the email address,
+%% and the form \ead[url] for the home page:
+%% \title{Title\tnoteref{label1}}
+%% \tnotetext[label1]{}
+%% \author{Name\corref{cor1}\fnref{label2}}
+%% \ead{email address}
+%% \ead[url]{home page}
+%% \fntext[label2]{}
+%% \cortext[cor1]{}
+%% \affiliation{organization={},
+%%            addressline={}, 
+%%            city={},
+%%            postcode={}, 
+%%            state={},
+%%            country={}}
+%% \fntext[label3]{}
+
+
+% %%Graphical abstract
+% \begin{graphicalabstract}
+% %\includegraphics{grabs}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=6.5 in, height=4 in]{images/abstract_4.png}
+%     %\caption{\label{fig0}Graphical Abstract}
+% \end{figure}
+% \end{graphicalabstract}
+
+% %%Research highlights
+% \begin{highlights}
+% \item Introduce a mesoscopic in-transit node to reconstruct the station inventory dataset.
+% \item Physics-guided spatiotemporal model with dynamic graphs at different time scales.
+% \item Form uncertainty set from the mesoscopic in-transit node and link it to rebalancing.
+% \end{highlights}
+
+\title{Physics-Guided Dynamic Graph Convolution Networks for Global Prediction and Rebalancing of Bike-Sharing Systems\\} %% Article title
+
+\author{Zhushi Jin $^{a}$}
+\author{Zihao Tian $^{b,*}$ \corref{cor1}}\ead{tianzihao@nju.edu.cn}
+\author{Jing Zhou $^{b}$}
+\author{Lixin Tian $^{a,c,*}$ \corref{cor2}}\ead{tianlx@ujs.edu.cn}
+\author{David Z.W. Wang $^{d}$}
+
+%% Author affiliation
+\address[a]{Institute of Carbon Neutrality Development, School of Mathematical Sciences, Jiangsu University, Zhenjiang, Jiangsu, 212013, China}
+\address[b]{School of Management and Engineering, Nanjing University, Nanjing, Jiangsu, 210093, China}
+\address[c]{Jiangsu Province Engineering Research Center of Spatial Big Data, School of Mathematical Sciences, Nanjing Normal University, Nanjing, Jiangsu 210023, China}
+\address[d]{School of Civil and Environmental Engineering, Nanyang Technological University, Singapore}
+
+
+%\title{Joint System-Wide Forecasting and Rebalancing of Bike-Sharing Systems with a Physics-Guided Dynamic Graph Convolution Network}
+
+%% use optional labels to link authors explicitly to addresses:
+%% \author[label1,label2]{}
+%% \affiliation[label1]{organization={},
+%%             addressline={},
+%%             city={},
+%%             postcode={},
+%%             state={},
+%%             country={}}
+%%
+%% \affiliation[label2]{organization={},
+%%             addressline={},
+%%             city={},
+%%             postcode={},
+%%             state={},
+%%             country={}}
+
+%\author{} %% Author name
+
+%% Author affiliation
+%\affiliation{organization={},addressline={},city={},postcode={},state={},country={}}
+
+%% Abstract
+\begin{abstract}
+Reliable observation and prediction of station-level bike inventories are essential for the efficient operation of bike-sharing systems. However, existing forecasting methods yield results that are difficult to directly apply to decision-making and fail to align with uncertain environments, leading to reduced feasibility and efficiency in rebalancing operations. Therefore, we propose a physics-guided dynamic spatiotemporal graph convolutional network (PDST-GCN) and integrate it with a data-driven robust optimization framework to achieve decision support from bike inventory forecasting to rebalancing. At the data level, we reconstruct station inventory time series from raw origin-destination (OD) trip records and fuse operator relocation information. We further introduce a ``mesoscopic in-transit node'' to represent bikes en route, compensating for missing bike state representations and thereby restoring physical conservation semantics in the data representation. At the model level, PDST-GCN constructs multi-scale spatiotemporal dynamic graph embeddings to emulate aggregation and diffusion processes. It ensures physical consistency of predictions through physical information-guided graph embeddings and customized losses. At the decision level, we build uncertainty sets from model outputs and impose relative constraints derived from the mesoscopic in-transit node to prune infeasible scenarios, thus constructing a robust rebalancing decision model. Empirical evaluation on the New York City Citi Bike system shows that PDST-GCN outperforms representative baselines, while attaining superior physical consistency. Incorporating constraints derived from mesoscale in-transit nodes into the robust rebalancing problem substantially reduces solution time, demonstrating the practical value of this structural augmentation in urban traffic management.
+\end{abstract}
+
+%% Keywords
+\begin{keyword}
+Mesoscopic in-transit node\sep~Bike inventory forecasting\sep~Spatiotemporal dynamic graph embeddings\sep~Physics-guided learning\sep~Robust rebalancing.
+\end{keyword}
+
+\end{frontmatter}
+
+%% Add \usepackage{lineno} before \begin{document} and uncomment 
+%% following line to enable line numbers
+%% \linenumbers
+
+%% main text
+%%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=5.5 in, height=3.5 in]{images/abstract_4.png}
+    \caption*{\textbf{Graphical Abstract}}
+\end{figure}
+
+
+%% Use \section commands to start a section
+\section{Introduction}\label{sec1}
+As urban functions become increasingly sophisticated and environmental awareness grows, shared bikes have been progressively integrated into urban transportation systems as a green and convenient travel mode. However, achieving efficient operation of bike-sharing systems remains challenging. It not only requires accurate station-level forecasts of bike inventories, but more critically, it demands that these forecasts align with uncertain rebalancing decision scenarios. The accuracy of station-flow forecasts directly affects rebalancing decisions, which in turn determine station-level supply-demand balance and users' service experience. Scientifically grounded forecasts can also provide operators with decision support to optimize resource allocation and reduce operating costs.
+
+Station flows in bike-sharing systems are jointly influenced by many complex factors, including station geographic attributes, dynamically changing weather conditions, and users' intrinsic spatiotemporal travel patterns. Traditional traffic prediction approaches—such as statistical regression and classical time-series models—have intrinsic limitations when applied to bike-sharing flow forecasting because they struggle to capture complex spatiotemporal dependencies. In recent years, Graph Neural Networks (GNNs) have been widely adopted in traffic forecasting by explicitly modeling non-Euclidean spatial dependencies among nodes using graph structures (\cite{bruna2013spectral},~\cite{wu2020comprehensive}). Representative works apply graph convolutions and temporal models to learn interactions between locations~(\cite{yu2018spatio},~\cite{guo2019attention},~\cite{bai2020adaptive}). However, a persistent limitation in existing traffic applications of GNNs is that the graph structure is typically predefined-based on physical distance, attribute similarity among points of interest, or velocity-based measures (\cite{he2020towards},~\cite{li2022tworesnet}). Although such constructions have intuitive merits, their edges often do not directly represent actual traffic interactions and cannot precisely reflect the time-varying strength of associations between nodes. Consequently, their model lack clear physical meaning.
+
+The bike-sharing domain provides a natural foundation for constructing physically meaningful dynamic graphs. The number of trips between stations offers a direct, quantitative measure of interaction strength. By aggregating high-frequency origin-destination (OD) trip records into time-sliced dynamic adjacency matrices (\cite{feng2024spatial}), one can explicitly capture the actual interaction intensity (trip volume) between any pair of stations within a given time window (e.g., every 5 minutes or hourly), and update this structure continuously over time. This interaction-based dynamic-graph construction not only captures how spatial dependencies among stations evolve over time, but, crucially, preserves real flow interaction patterns—forming a solid, data-driven basis for subsequent dynamic-graph neural network forecasting.
+
+Despite these advantages, many current studies on bike-sharing flow forecasting still suffer from several shortcomings. First, traffic flow exhibits pronounced spatiotemporal nonstationarity: the association strength between stations can change dramatically with time of day (peak vs.~off-peak) and calendar type (weekday vs.~weekend). Yet most GNN-based predictors rely on static graphs and thus fail to capture these dynamic spatial dependencies. Although dynamic graph neural networks have recently attracted attention (\cite{li2023dynamic}), their graph-construction strategies often depend primarily on node time series features (\cite{guo2020optimized},~\cite{li2022data}). Such approaches underutilize the naturally occurring high-frequency OD flows and periodicity in bike-sharing systems, and therefore inadequately model the dynamic nature of the graph structure and time-varying explicit interactions among stations.
+
+On the other hand, mainstream work in bike-sharing flow forecasting has largely concentrated on predicting rental and return demands, which can be directly achieved by constructing dynamic graphs and datasets from trip records (\cite{feng2024spatial}). However, such demand-oriented objectives are often decoupled from operators' operational goals, overlooking that demand forecasting's core purpose is to enable operators to swiftly execute real-time rebalancing based on predictions, thereby maintaining system efficiency and maximizing revenue. Demand forecasts alone do not automatically serve as direct inputs to rebalancing decisions, and higher predictive accuracy does not necessarily translate into optimal inventory or rebalancing plans (\cite{gammelli2022predictive}). From operators' perspective, the real-time station inventory is the immediate trigger and the most relevant input for rebalancing. In addition, station inventories cannot be obtained simply by subtracting departures from arrivals; reconstructing them requires knowledge of prior inventory levels and explicit accounting for operator relocations. Consequently, to support operators' rebalancing decisions and thereby maintain service levels, it is necessary not only to use station inventory as a forecasting target but also to reasonably reconstruct a dataset that includes historical inventory and rebalancing information.
+
+Conventional prediction approaches typically rely solely on historical flow data and employ deep learning to capture complex nonlinear relationships among stations. For example,~\cite{li2023improving} combined irregular convolution with LSTM to identify relevant neighborhoods from observed histories and perform temporal forecasting. While such methods offer expressive modeling power, they commonly neglect a fundamental physical constraint—the conservation of total vehicle count. As a result, purely data-driven predictors can produce outcomes that contradict physical reality: local station inventories may appear to increase or decrease “out of thin air,” or predicted bike counts may become negative (\cite{MOHSENI2026104701}). Outputs that violate conservation not only undermine model credibility but also erode the practical value of forecasts: they can produce infeasible rebalancing plans, misallocate resources, raise operational costs, and—even in extreme cases—precipitate system-level failures. Thus, optimizing for predictive accuracy alone, without enforcing physical consistency, poses a fundamental risk. To bridge this gap, we reconstruct raw trip records into a physically consistent dataset and incorporate physics-guided mechanisms into the model. By embedding the weakest first-principles physical quantity into the learning process, we preserve deep models' ability to capture complex spatiotemporal patterns while guaranteeing that predictions are physically coherent, interpretable, and directly usable for downstream optimization and rebalancing.
+
+Among existing studies on bike-sharing flow forecasting, spatiotemporal modeling based on graph neural networks has become the dominant paradigm. Researchers have combined various graph-convolution operators with sequence models to enhance the learning of nonlinear dependencies among stations. However, most studies remain focused on predicting travel demand and therefore do not adequately serve the operator's core decision task of rebalancing. Efforts to incorporate dynamic graphs and temporal encodings have grown; however, many approaches still handle time and flow information implicitly—by merely concatenating temporal features to node inputs—or build graphs only from node time series. As a result, they underutilize the rich, high-frequency OD flows and the strong periodicities intrinsic to bike-sharing systems. More importantly, existing models frequently ignore physical and operational constraints, producing forecasts that violate real-world conservation laws and making downstream rebalancing plans infeasible or suboptimal; as a result, the combined performance of prediction and optimization is degraded. Against this background and current trends, the following research question is central.
+
+{\bf Question:} In the spatiotemporally dynamic and uncertain operational environment of bike-sharing systems, how can forecasts be made physically consistent so that they can be used directly to support rebalancing decisions?
+
+This paper adopts an operator-centric perspective. We reconstruct trip flows to build a new station-inventory dataset for bike-sharing, design a physics-guided graph convolution network forecast model, and couple the predictor with a robust optimization scheme for rebalancing. Specifically, we introduce a concept of the mesoscopic in-transit node and develop a bike-localization algorithm based on this abstraction, forming a complete pipeline to reconstruct station inventory time series. We then analyze the spatiotemporal characteristics of bike-sharing flows and design multi-scale, time-embedded dynamic graphs that simulate flow aggregation and diffusion. And we construct a physics-guided global graph-embedding module grounded on the mesoscopic in-transit node to predict system-wide station inventories. Finally, we use forecast outputs to build data-driven uncertainty sets and formulate a two-stage robust optimization model for rebalancing. Numerical experiments show that our graph structure, built upon the mesoscopic in-transit node,  supports precise bike localization. The physics-guided spatiotemporal dynamic-graph model substantially improves forecast accuracy and physical consistency. The robust optimization model, incorporating relative constraints induced by the mesoscopic in-transit node, significantly improves the solution efficiency while producing practically applicable rebalancing plans.
+
+The main contributions of this paper include:
+
+(a) We introduce the concept of a “mesoscopic in-transit node”, which aggregates all bikes currently in active trips. This node reconstructs a physically consistent dataset of station bike inventory, constraining deep learning within the prediction model by establishing physical conservation equations and controlling the uncertainty level of robust rebalancing models. Unlike approaches that rely solely on docked-system observations (\cite{chen2021comparative}), our method applies equally to free-floating bike-sharing systems and simultaneously captures the effects of ride flows and operator rebalancing on inventory dynamics, yielding a more actionable data foundation for rebalancing decision support.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=5.0 in, height=3.3 in]{images/buhuo.png}
+    \caption{\label{fig2}Model Research Framework}
+\end{figure}
+
+(b) We propose a physics-guided deep learning model for station-inventory forecasting. Motivated by the spatiotemporal signatures of bike-sharing flows, we design multi-scale, time-embedded dynamic graph structures that emulate the aggregation and diffusion of trip flows and use temporal encodings to modulate the graphs' influence on node features. On top of this, we build a global graph-embedding module guided by the mesoscopic in-transit node and redesign the training loss to promote physical consistency. Empirical results show that, relative to a recent representative baseline (\cite{kong2024spatio}), the proposed model reduces MAE and RMSE by roughly 8\% on average, demonstrating simultaneous gains in predictive accuracy and physical coherence.
+
+(c) The model directly outputs station-level inventories rather than merely estimating borrow/return demand, so predictions can be used verbatim as inputs to rebalancing optimization—enabling end-to-end integration of forecasting and decision-making. Conservation constraints derived from the mesoscopic in-transit node are used to prune the uncertainty sets, removing scenarios that violate inventory dynamics and thereby reducing problem size and infeasibility. Numerical experiments demonstrate that physical constraints reduce decision conservatism while shortening solution time by approximately 91\%, generating more actionable rebalancing plans.
+
+The mesoscopic in-transit node proposed here reconstructs the modeling framework from first principles, effectively bridging accurate inventory forecasting and robust decision-making. It advances current directions in bike-sharing flow prediction and enhances both the theoretical soundness and practical applicability of robust rebalancing methods.
+
+The remainder of this paper is organized as follows. Section 2 reviews the development of graph neural network-based prediction methods in the transportation domain. Section 3 presents the proposed deep learning framework for bike-sharing inventory forecasting together with the robust rebalancing model. Section 4 reports the forecasting performance and the solution results of the rebalancing model. Section 5 concludes the paper and outlines directions for future research.
+
+
+\section{Literature review}
+
+\subsection{Research on prediction based on GNN}
+Early graph neural network approaches for traffic forecasting primarily sought to capture spatial dependence but were constrained by static assumptions about graph topology.~\cite{yu2018spatio} introduced STGCN (Spatio-Temporal Graph Convolutional Networks), a seminal framework that combines graph convolutional networks (GCNs) with temporal convolutional networks (TCNs). STGCN applies a Chebyshev-polynomial approximation for spatial filtering to model correlations among neighboring nodes, and uses temporal convolutions to capture short-term temporal dynamics, yielding effective traffic-flow prediction performance. However, because its graph is constructed from a pre-specified road topology (e.g., distance-based or connectivity-based adjacency matrices), STGCN is limited in its ability to represent time-varying spatial dependencies.~\cite{wu2019graph} introduced the Graph WaveNet framework, constructing an adaptive adjacency matrix that automatically uncovers latent spatial correlations through learnable node embeddings.~\cite{bai2020adaptive} proposed Adaptive Graph Convolutional Recurrent Networks (AGCRN), performing graph convolutions via dual embeddings from both graph and node perspectives while dynamically adjusting the graph structure during training.~\cite{wu2020connecting} achieved accuracy comparable to strongly supervised graph methods without requiring road network priors, through learnable adjacency matrices and hybrid skip-graph convolutions. Together, these advances shift the field from manually defined spatial associations toward dynamic, data-driven graph reconstruction, substantially improving the expressiveness of spatial representations in complex road networks.
+
+Temporal modelling has progressed from locally truncated dependencies toward long-range capture and, ultimately, integrated spatio-temporal representations.~\cite{guo2019attention} introduced a temporal-attention mechanism and exploited multi-source historical information to select salient frames, thereby enhancing prediction accuracy.~\cite{wu2019graph} employed stacked dilated causal convolutions to enlarge the receptive field, avoiding the vanishing/~exploding-gradient issues commonly associated with RNN architectures.~\cite{li2023dynamic} adopted a curriculum-learning strategy that progressively extends the forecasting horizon to improve RNN training, and they proposed the  Dynamic Graph Convolutional Recurrent Network (DGCRN), which generates dynamic graphs from node-level flow, temporal and hidden-state information to achieve an initial form of spatio-temporal fusion.~\cite{fang2023spatio} presented a “decoupling-then-refusion” framework, STWave, which explicitly decomposes raw traffic series via discrete wavelet transform into low-frequency trend and high-frequency event components.~\cite{kong2024spatio} casted traffic propagation as a two-stage “aggregation and distribution” process and used time-lagged cross-correlation together with learnable weights to compute node-level scores for explicit selection of key nodes. Collectively, these advances trace a clear evolution from static spatial modelling toward dynamic, joint spatio-temporal paradigms, laying a firmer foundation for more accurate traffic forecasting.
+
+\subsection{Research on traffic prediction based on shared bikes}
+
+Early demand forecasting for bike-sharing systems was dominated by statistical regression and classical time-series methods (e.g., ARIMA), and later by deep-learning sequence models such as LSTM. Although these approaches can capture temporal dependence from historical flows, they do not model spatial inter-site relationships. To address this shortcoming, researchers have incorporated graph neural networks (GNNs) to encode spatial dependency and have combined them with temporal modules, yielding two principal families of architectures. One family treats a static graph as the basic modelling unit and augments it with temporal components.~\cite{he2020towards} modelled stations as graph nodes and rental/return flows as edges, employing graph convolution and attention mechanisms to capture spatial-temporal correlations and using multi-level modules to learn flow features at different temporal scales.~\cite{liang2023deep} developed a GNN-based multi-graph attention network that constructs local graphs centred on each station, enabling the prediction of demand for newly deployed stations during bike-sharing systems expansion and demonstrating the influence of the urban built environment on demand. However, its graph construction still relies on static geographic relationships and does not fully exploit inter-station OD flows.~\cite{sun2024public} proposed a GNN for bike-sharing demand forecasting whose key contributions are the construction of local spatio-temporal graphs and a dynamic spatial-attention mechanism. The local spatio-temporal graphs—despite incorporating neighboring time slices—are still formed on the basis of distance-derived, effectively static graph structure.
+
+Another category treated dynamic graphs themselves as the modelling unit. Studies adopting this perspective for bike-sharing were scarce and concentrated on demand forecasting.~\cite{li2022data} generated time-varying weighted graphs from intra-period flows and used an attention mechanism to produce node-pattern correlation graphs, replacing classical graph-Laplace aggregation with a multi-layer weighted aggregation to capture dynamically evolving inter-station connections. However, their flow-convolution graph was constructed from learned embeddings and thus lacked clear physical interpretability.~\cite{feng2024spatial} exploited the intrinsic advantages of trip records to build graph data at the time-slice level, defining dynamic adjacency by rental events within each slice and accounting for both local, time-aware spatial structure and an unweighted global spatial topology. However, it does not incorporate the underlying static graph structure, relying purely on dynamic graph networks for construction, and only predicts demand for shared bikes.
+
+\cite{xu2023multi} proposed a Transformer-encoder-based neural process model (TENP) for multi-task supply-demand forecasting and reliability analysis in docked bike-sharing systems. The model directly produced predictive distributions and combined the predicted pickup and return distributions to derive risk-quantification metrics for decision support. However, it did not account for station-level available-bike inventory in the decision process, and its output usage remained at the level of station risk assessment rather than being translated into concrete rebalancing actions.~\cite{chang2023smart} developed a multi-task spatio-temporal neural network that combined residual convolutions with embedded LSTMs to capture spatio-temporal dependencies, and adopted a multi-task learning framework to share information among related prediction targets, thereby improving region-level inflow and outflow forecasts. Their rebalancing model incorporated vehicle speed to estimate carbon emissions and included the recovery of unavailable bikes. Still, it likewise ignored the effect of per-region available-bike counts on rebalancing decisions. Furthermore, it directly uses prediction results as optimization model parameters, forcing supply-demand gaps to match through constraints, without considering how prediction errors and random demand fluctuations might alter decisions.
+
+
+\section{Methodology}
+
+In this section, we first formalize the problem of forecasting station-level bike inventory from the operator's perspective. We then introduce the concept of ``mesoscopic in-transit node'' and describe a reconstruction pipeline that transforms raw trip flows into a time-series dataset of station inventories. Building on this process, we propose and implement an inventory forecasting framework tailored to docked bike-sharing systems. The framework comprises a static global-information attention layer and two dynamic spatio-temporal embedding layers, and incorporates a physics-guided module that enforces physical constraints on station inventories to improve predictive fidelity. Finally, using the forecasts together with these physical constraints, we reconstruct uncertainty sets and formulate a novel robust rebalancing model. 
+
+\subsection{Problem Formulation and Data Processing Framework}
+
+Consider a bike-sharing system composed of $N$ stations, where the number of bikes at station $i$ is inferred from trip records. The system is represented by an undirected graph $G=(V, E, A)$, with $V$ denoting the set of stations, $E$ the set of edges describing station-to-station connectivity, and $A$ the binary adjacency matrix such that $A_{ij}=1$ if and only if $(v_i,v_j)\in E$ and $A_{ij}=0$ otherwise. At each discrete time step $t$, the system is associated with a feature matrix $X(t)\in\mathbb{R}^{N\times D}$, whose $i$-th row comprises the $D$-dimensional feature vector for station $i$ (for example, the current bike count together with auxiliary attributes).
+
+\noindent{\bf Inventory Forecasting Problem}: Given a sequence of feature values $[X_{t-s},\ldots,X_t]$ from the past $s$ time steps, learn a mapping
+\begin{equation}
+f:\left[X_{t-s},\ldots,X_t\right]\mapsto \left[\hat{X}_{t+1},\ldots,\hat{X}_{t+T}\right]
+\end{equation}
+such that the prediction error for the station inventory over the next $T$ time steps is minimized.
+
+Operators typically only record ride events, and initial station inventory data is difficult to obtain directly. To construct physically consistent training samples, we designed the following data reconstruction process.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=5.5 in, height=3.2 in]{images/shujulicheng.png}
+    \caption{\label{fig311}A data reconstruction framework for bike-sharing station inventories}
+\end{figure}
+
+\subsubsection{Initial Distribution Estimation}
+
+We refine the location sedimentation algorithm proposed in~\cite{liu2024designing} to obtain an improved estimate of the initial inventory of each station. The method introduces an intermediate time $T_{\mathrm{temp}}$ and operates in two stages: a first stage that uses data up to $T_{\mathrm{temp}}$ to infer an approximate spatial distribution of bikes, and a second stage that uses observations after $T_{\mathrm{temp}}$ to correct and refine that estimate. Compared with the original scheme, our modification incorporates a tagging mechanism that marks bikes assigned during the second stage, thereby preventing the same bike from being repeatedly relocated across iterations. This simple but effective enhancement stabilizes the iterative relocation process and yields more consistent and physically plausible initial-distribution estimates for downstream forecasting.
+
+\begin{breakablealgorithm}
+\caption{Improved Location Sedimentation Algorithm}\label{alg:initial_distribution}
+\begin{algorithmic}
+    \ENSURE~Initial bike counts at each station $station\_count$
+    \FOR{$row$ in cycling records data}
+        \IF{$return\_time < T_{\mathrm{temp}}$} 
+            \STATE~$bike\_loc[bike\_id] \leftarrow end\_station$ \COMMENT{Stage 1: update bike's current station}
+        \ELSE
+            \IF{$bike\_id \in bike\_secondor$}
+                \STATE~$bike\_secondor[bike\_id] \leftarrow 0$ \COMMENT{Stage 2: not the first appearance}
+            \ELSE 
+                \STATE~$bike\_secondor[bike\_id] \leftarrow 1$ \COMMENT{Stage 2: first appearance}
+                \STATE~$bike\_loc[bike\_id] \leftarrow start\_station$ \COMMENT{Stage 2: set bike's location at time $T_{\mathrm{temp}}$ to its trip start}
+            \ENDIF 
+        \ENDIF
+    \ENDFOR
+    \STATE\textbf{update} $station\_count$ \textbf{from} $bike\_loc$
+    % \RETURN $station\_count$
+    \end{algorithmic}
+\end{breakablealgorithm}
+
+\subsubsection{Derivation of Full-Time Distribution}
+
+Following the estimation of initial station inventory via the improved location sedimentation algorithm, we reconstruct station-level bike inventories at arbitrary time points from the trip records. Repeatedly applying the location sedimentation algorithm would require scanning the entire dataset at every iteration. To avoid this expensive operation, we propose a real-time state update algorithm that simulates station flows over user-specified intervals by aggregating only the trip records that fall within each interval. Additionally, we considered the impact of operator scheduling on station bike counts, specifically including scenarios where shared bikes are scheduled to be moved between adjacent time intervals. 
+
+\begin{breakablealgorithm}
+    \caption{State Update Algorithm}\label{alg:bike_flow_distribution}
+    \begin{algorithmic}
+    \REQUIRE~Cycling records data: $data$. Initial station inventory: $bike\_loc$
+    \ENSURE~Bike counts at each station per time step: $time\_dict$
+    \FOR{$current\_time$ in $time\_list$}
+        \STATE Filtered records in the selected time period: \\
+        \raggedright $filtered\_data \leftarrow data\bigl[(data[return\_time] > current\_time) \land \allowbreak ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        (data[borrow\_time] < current\_time + interval)\bigr]$%
+
+        \FOR{$row$ in $filtered\_data$}
+            \IF{$return\_time \geq current\_time$ \AND $return\_time \leq current\_time + interval$}
+                \STATE $bike\_loc[bike\_id] \leftarrow end\_station$
+                \STATE Obtain the bike's next usage record: $next\_index$
+                \IF{$new\_start\_station \neq end\_station$ \AND $new\_start\_time < current\_time + 2 \times interval$}
+                    \STATE $bike\_loc[bike\_id] \leftarrow new\_start\_station$
+                \ENDIF
+            \ELSIF{$borrow\_time > current\_time$ \AND $return\_time > current\_time + interval$}
+                \STATE $bike\_loc[bike\_id] \leftarrow start\_station$
+            \ELSE
+                \STATE $bike\_loc[bike\_id] \leftarrow None$
+            \ENDIF
+        \ENDFOR \\
+        \STATE {\bf update} $new\_station\_count$ by $bike\_loc$\\
+        \STATE $time\_dict[current\_time + interval] \leftarrow new\_station\_count$
+    \ENDFOR
+    \RETURN $time\_dict$
+\end{algorithmic}
+\end{breakablealgorithm}
+
+Applying the state update algorithm yields per-station bike counts at each timestamp, which form the graph-structured input required by the forecasting model. We encode station inventory as the first feature channel of $X_t$. Because inventory levels exhibit strong temporal regularities—for example, markedly different counts during morning and evening peaks—we include two additional temporal feature channels. The second channel encodes the position of the current time within the day, and the third channel encodes the position of the current day within the week.
+
+\subsection{Physics-Guided Module}
+
+In the bike-sharing flow-forecasting literature, existing approaches commonly suffer from two intrinsic shortcomings: measurement error at the data level and black-box error at the model level (\cite{li2023improving}).  At the data level, limitations of state-inference procedures, such as the location sedimentation algorithm, lead to systematic mischaracterisation of bike locations. For instance, at time $t$, a bike that is en route may nevertheless be recorded as remaining at its trip origin, inflating that station's counted inventory despite the bike's absence. Such misallocations distort station-level inventory statistics. In applications that predict only inflows and outflows on fixed time slices, bikes in transit may fall outside every station's interval counts, which further degrades robustness to noise and reduces the fidelity of the training signal. At the model level, prevailing methods typically rely solely on historical flow observations and employ deep learning to capture complex nonlinear dependencies across stations. These purely data-driven models lack physical constraints and may therefore produce predictions that violate basic realities. For instance, total fleet size may be inconsistent across time or some sites may be assigned negative bike counts (\cite{MOHSENI2026104701}), revealing a limited ability to learn the collaborative dynamics of shared bike flows between stations.
+
+State ambiguity in snapshot-based models of bike-sharing systems arises because bikes that are in-transit at a given observation instant cannot be unambiguously attributed to either their trip origin or destination. Forcing such in-transit bikes to be assigned to a station produces spurious inventory fluctuations at the snapshot level, which in turn may drive station-inventory predictors to learn patterns that violate basic physical constraints. Closely analogous representations already exist in other domains. In computer networking, packets that have been sent but not yet acknowledged—so-called in-flight packets—are measured by the flight size and directly determine effective throughput (\cite{biaz2003round}). Such in-transit resources belong neither to the sender's buffer nor the receiver's buffer, yet must be independently accounted for in the system total to ensure protocol conservation. In transportation and supply-chain management, in-transit inventory denotes goods that have left the shipper but not yet arrived at the receiver, and its accounting is essential for inventory reconciliation and supply-chain robustness (\cite{zhi2022effects}). Although these disciplinary paradigms may appear distinct, they share a common conceptual foundation: the explicit representation of in-transit resources. Accordingly, the explicit modelling of in-transit resources is not a peripheral technicality but a necessary precondition for preserving inventory consistency and for ensuring the validity of models of bike-sharing systems.
+
+Motivated by this cross-disciplinary insight, we introduce a ``mesoscopic in-transit node'' into bike-sharing system models — a virtual entity that aggregates all bikes currently in use. Under this design, the system state is discretized into semantically interpretable location categories: station nodes denote parked inventory, while the mesoscopic in-transit node represents the in-transit inventory. As a result, every bike carries a unique, semantically meaningful label in each snapshot, which prevents spurious back-attribution to origins and premature counting at destinations. The proposed construction enforces fleet conservation at the snapshot level and provides forecasting models with explicit semantic constraints, thereby improving both the physical consistency and the operational interpretability of downstream predictions.
+
+To ensure the scale-consistency of the ``mesoscopic in-transit node'', we explicitly delimit the modelling objectives across three nested scales: micro, meso and macro.
+
+\begin{itemize}
+\item Micro scale: the unit of analysis is the individual bike. Models track precise trajectories and continuous positions. Micro-scale models provide fine-grained descriptions of individual behaviour and route choice, but they are sensitive to positioning noise and high-frequency fluctuations and therefore are of limited direct use for station-level dispatch decisions.
+\item Mesoscopic scale: the unit of analysis is an ensemble. Examples include a station or the aggregated subnet. This scale preserves essential spatial resolution while suppressing micro-level noise through aggregation, thereby balancing observability and decision relevance.
+\item Macro scale: the unit of analysis is the entire system or a large region. Only total fleet counts and aggregate flows are considered. Macro models are stable and easy to observe, but they lack spatial detail and cannot support fine-grained, station-level or subregion dispatching.
+\end{itemize}
+Based on these scale considerations, we define the in-transit state as a mesoscopic statistic and incorporate it into the station network as an explicit network node. The formal definition follows.
+
+\paragraph{Definition: Mesoscopic In-transit Node} The mesoscopic in-transit node is treated as a node in the bike-sharing station graph.
+\begin{itemize}
+    \item[1.] An edge connects an origin station and the mesoscopic in-transit node if a bike departs from that station and remains in use during the specified time interval.
+    \item[2.] An edge connects the mesoscopic in-transit node and a destination station if a bike that began its trip before the specified interval terminates at that station within the interval.
+    \item[3.] The inventory of the mesoscopic in-transit node is determined by the number of bikes currently in use at the current time snapshot.
+\end{itemize} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=4.5 in, height=3.2 in]{images/jiedianshiyi2.png}
+    \caption{\label{fig321}Schematic of mesoscopic in-transit node}
+\end{figure}
+
+\noindent {\bf Note 1}: The key design principle is to treat ``in-transit'' as an independent state container rather than forcibly attributing moving bikes to any static station. This definition guarantees that, at any snapshot, each bike has exactly one interpretable state label: at-station or in-transit.
+
+Conservation laws provide the most fundamental mathematical description of systems that preserve a quantity. If a physical quantity (mass, particle number, probability, etc.) is neither created nor destroyed within a closed domain, its density $\rho(\mathbf{x},t)$ and flux $\mathbf{j}(\mathbf{x},t)$ satisfy the local continuity equation.
+
+\begin{equation}
+\frac{\partial \rho(\mathbf{x},t)}{\partial t} + \nabla \cdot \mathbf{j}(\mathbf{x},t) = 0.
+\end{equation}
+
+In the discrete scenario of the bike-sharing system, this equation implies that the temporal change of bike density at a location equals the negative of the net outflow  (or net inflow) at that location. In other words, changes in density over time are fully determined by transfers of bikes between neighbouring locations, with no exogenous creation or annihilation. We define the discrete quantities: station inventory $S_i(t)$, in-transit inventory $I(t)$, and directed edge flow $f_{a\to b}(t)$ yielding the following difference equations:
+
+\begin{equation}
+S_i(t+1)-S_i(t)=\sum_{a} f_{a\to i}(t) - \sum_{b} f_{i\to b}(t),
+\end{equation}
+\begin{equation}
+I(t+1)-I(t)=\sum_{i} f_{i\to 0}(t) - \sum_{j} f_{0\to j}(t).
+\end{equation}
+For ease of representation, we denote the mesoscale in-transit nodes as ``0'' nodes in the equation. 
+
+At the microscopic level, trajectories of individual agents are stochastic and generally unpredictable. However, at suitably chosen spatio-temporal scales, population densities and mean fluxes typically behave as smooth, deterministic fields. In the bike-sharing context, although the trip of a single bike is discrete and uncertain, the mesoscopic statistics—station inventories and the number of bikes in transit—are amenable to a conservation-based description when projected onto discrete time snapshots and network nodes. Summing the station balances and including the in-transit term causes internal edge fluxes to cancel, yielding the global conservation relation.
+\begin{equation}
+\sum_{i\in V} S_i(t+1) + I(t+1) = \sum_{i\in V} S_i(t) + I(t) = N_b,
+\end{equation}
+where $N_b$ represents the total number of bikes in the system, treated as constant on the chosen time scale. Crucially, the mesoscopic in-transit inventory $I(t)$ acts as a natural smoothing statistic. As a prior for learning-based models, it reduces sensitivity to sampling noise, localization gaps and exogenous perturbations, thereby improving generalization and preserving the physical consistency of downstream predictions.
+
+The key advantage of the mesoscopic in-transit node is that it renders inter-node complementarity explicit and representable by linear relations. Specifically, the conservation constraint $\sum_{i} S_i(t) + I(t) = N_b$ implies a direct complementarity between station inventories and in-transit inventory, so that the evolution of the system total can be described by a linear equation. This property stands in marked contrast to common forecasting models that rely on deep nonlinear models. Those models are powerful in representation but often lack physical interpretability and may produce predictions that violate basic system constraints. By introducing the mesoscopic in-transit node and the associated linear constraints, we constrain nonlinear learning within a linear framework. This hybrid approach retains the flexibility of nonlinear models for capturing complex spatio-temporal dependencies while imposing simple linear rules to preserve physical self-consistency. In this way, the mesoscopic in-transit node forms an explicit bridge between physics and data-driven methods, improving both the credibility and the operational utility of model outputs.
+
+Guided by the foregoing definition and the conservation law, we address deficiencies at both the data level and the model level. At the data level, we construct a historical dataset that is semantically consistent with the mesoscopic in-transit node. During preprocessing, we run the state update algorithm for each time window so that the mesoscopic node is inserted into the station set and every snapshot records station inventories and the in-transit inventory in a coherent way. For ease of representation, we denote the mesoscale in-transit nodes as ``0'' nodes in the algorithm. 
+
+\begin{breakablealgorithm}
+    \caption{State Update Correction Algorithm (Including “0” Node)}\label{alg:bike_flow_distribution(0)}
+    \begin{algorithmic}
+    \REQUIRE Cycling records data: $data$. Initial station inventory: $bike\_loc$
+    \ENSURE Bike counts at each station per time step (with ``0'' node): $time\_dict$ 
+    \FOR{$current\_time$ in $time\_list$}
+        \STATE Filtered records in the selected time period: \\
+        \raggedright
+        $filtered\_data \leftarrow data\bigl[(data[return\_time] > current\_time) \land \allowbreak ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        (data[borrow\_time] < current\_time + interval)\bigr]$
+
+        \FOR{$row$ in $filtered\_data$}
+            \IF{$return\_time \geq current\_time$ \AND $return\_time \leq current\_time + interval$}
+                \STATE $bike\_loc[bike\_id] \leftarrow end\_station$
+                \STATE Obtain the bike's next usage record: $next\_index$
+                \IF{$new\_start\_station \neq end\_station$ \AND $new\_start\_time < current\_time + 2 \times interval$}
+                    \STATE $bike\_loc[bike\_id] \leftarrow new\_start\_station$
+                \ENDIF
+            \ELSIF{$borrow\_time > current\_time$ \AND $return\_time > current\_time + interval$}
+                \STATE $bike\_loc[bike\_id] \leftarrow 0$
+            \ELSE
+                \STATE $bike\_loc[bike\_id] \leftarrow 0$
+            \ENDIF
+        \ENDFOR \\
+        \STATE {\bf update} $new\_station\_count$ by $bike\_loc$\\
+        \STATE $time\_dict[current\_time + interval] \leftarrow new\_station\_count$
+    \ENDFOR
+    \RETURN $time\_dict$
+\end{algorithmic}
+\end{breakablealgorithm}
+
+
+At the model level, when historical observations and partial physical laws are available, a standard way to marry physics and deep learning is to embed physically meaningful quantities directly into the forecasting framework. We therefore design a physics-guided module centered on the mesoscopic in-transit node that can be plugged into any graph-based predictor. At every predicted time step, the module adjusts the raw model outputs by a conservation-based correction and computes a penalty that measures the deviation from the total number of bikes. This penalty is incorporated into the training objective as a regularizer. The resulting hybrid scheme preserves the expressive power of nonlinear, data-driven models while steering their outputs toward physical consistency. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=4.2 in, height=3.6 in]{images/gengxinshiyi2.png}
+    \caption{\label{fig322}Schematic diagram of the state update algorithm (including node 0)}
+\end{figure}
+
+
+\paragraph{Physics-guided module} 
+We introduce the weakest but crucial physical prior, conservation of total vehicle count, in a modular way into the forecasting pipeline. Over a chosen historical horizon and forecasting horizon, we assume the total number of available bikes remains unchanged, thus the total number of bikes across all nodes does not change. The module takes $\mathbf{X}$ as input and returns refined predictions $\mathbf{X}' \in \mathbb{R}^{B \times N \times T}$. The core steps are as follows:
+
+\paragraph{Step 1: Global Feature Summation}
+Sum the input feature matrix \(\mathbf{X}\) along the node dimension to obtain the global feature matrix:
+\begin{equation}
+\mathbf{G} = \sum_{i=1}^N \mathbf{X}_{:, i, :}, \quad \mathbf{G} \in \mathbb{R}^{B \times T}.
+\end{equation}
+where $\mathbf{G}$ represents the sum of global features across all time steps.
+\paragraph{Step 2: Residual Calculation}
+Compute the residual matrix by calculating the difference between the global features and the target value $S_{\text{target}}$. Broadcast the residual to the node dimension so that it aligns with node-level features:
+\begin{equation}
+\bm{\delta} = S_{\text{target}} - \mathbf{G}, \quad \bm{\delta} \in \mathbb{R}^{B \times N \times T}.
+\end{equation}
+\paragraph{Step 3: Generate Dynamic Adjustment Weights}
+Generate the global graph node embedding $\mathbf{E} \in \mathbb{R}^{N \times d}$ (where $d$ is the embedding dimension). Concatenate the expanded residual with the node embedding features, then generate the dynamic adjusted weight matrix through a two-layer fully connected network $\mathcal{N}_\text{dynamic}$:
+\begin{equation}
+\mathbf{W} = \mathcal{N}_\text{dynamic}(\text{concat}(\bm{\delta}, \mathbf{E})), \quad \mathbf{W} \in \mathbb{R}^{B \times N \times T}.
+\end{equation}
+where the activation functions of the fully connected layers are ReLU and Sigmoid, respectively.
+\paragraph{Step 4: Correction and Dynamic Adjustment}
+Form the adjustment term by elementwise multiplication of the residual and the dynamic weights. Introducing a learnable scaling factor $\alpha \in \mathbb{R}$, the final correction expression is:
+\begin{equation}
+\mathbf{X}^\prime = \mathbf{X} + \alpha \cdot \left( \bm{\delta}\odot \mathbf{W} \right),
+\end{equation}
+where $\odot$ denotes element-wise multiplication.
+\paragraph{Step 5: Integerization and Inference Stage Handling}
+To ensure integer-valued features during inference, we approximate integerization of $\mathbf{X}^\prime$ using a Straight-Through Estimator (STE):
+\begin{equation}
+\mathbf{X}^\prime = \mathbf{X}^\prime + (\lfloor \mathbf{X}^\prime \rceil - \mathbf{X}^\prime).detach(),
+\end{equation}
+where $\lfloor \cdot \rceil$ denotes rounding.
+
+For loss function computation, we introduce a novel loss function. We combine the $L_1$ norm with total quantity constraints and integer constraints to maximize alignment with real-world counts.
+\begin{equation}
+Loss function = \frac{1}{N}  \sum_{i=1}^N |X^{pre}_{:, :, :}-X^{real}_{:, :, :}|+\alpha\frac{1}{N}|\sum_{i=1}^N X^{pre}_{:, i, :} - \sum_{i=1}^N X^{real}_{:, i, :} |+\beta \frac{1}{N} \sum_{i=1}^N |X^{pre}_{:, :, :}-round(X^{pre}_{:, :, :})|,
+\end{equation}
+where $\alpha$ and $\beta$ are hyperparameters. The first term of the loss function represents an $L_1$ norm constraint on the difference between actual and predicted values. The second term penalizes deviations of the predicted total bike count from the true total, thus reducing violations of the conservation law. The third term reinforces integerization of the predictions.
+
+\subsection{Dynamic Spatiotemporal Graph Module}
+In this section, we propose two methods for constructing dynamic graphs, modulating temporal features through time encoding to jointly capture the spatio-temporal dependencies of station flows.
+
+Usage records from a bike-sharing system can be viewed as information flows on a graph whose nodes are bike stations. These flows display complex and rhythmic spatio-temporal patterns that arise from human activity. Because the spatial distribution and directionality of station flows vary markedly across time periods, a single static graph cannot fully represent these dynamics. Constructing spatio-temporal graphs that evolve over time is therefore necessary. To build such graphs, we partition the raw usage logs into predefined time windows. For each time window, we count departure and arrival events, and from these counts, we compute each station's net inflow or net outflow together with its mean displacement vector. Within each window, we also compute the mean displacement for stations of the same category to characterize the intensity and directionality of flows at different moments. The figure below shows the distribution of station mean displacements in the New York area at 9 a.m. and at 5 p.m. on September 3, 2019. This visualization directly reflects the convergent and divergent flow patterns during commuting peaks.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=5.5 in, height=2.4 in]{images/Figure 2025-08-18 172030.png}
+    \caption{\label{fig331}Average displacement of net outflow and average displacement of net inflow at 9:00 AM}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=5.5 in, height=2.4 in]{images/Figure 2025-08-18 172052.png}
+    \caption{\label{fig332}Average displacement of net outflow and net inflow at 5:00 PM}
+\end{figure}
+
+The figure indicates that flows during the morning commute exhibit clear spatial convergence, while the evening commute shows a dispersive pattern. To capture these two distinct spatial propagation mechanisms, we employ two graph convolution operators to extract time-dependent spatial features. One operator is a conventional aggregation-based graph convolution that reinforces neighborhood information. The other is a diffusion-based graph convolution that models information spread by simulating random walks on the graph. Their combination allows the model to represent the spatial structure of station flows more comprehensively across different temporal scales.
+
+\subsubsection{Time Encoding Embedding}
+Given the pronounced intra-day and intra-week periodicity of bike-sharing trips, we incorporate temporal information into the model input during data construction. For each time step, the input time features contain two dimensions. $h_t$ denotes the position of time $t$ within a day and $d_t$ denotes the position of the day within a week. The time encoding is derived from the timestamp at which node inventory data are generated, namely the position of the current moment within the day and the position of the current day within the week. We represent relative positions by numbers between zero and one. For example, the timestamp 15:20, Saturday, September 14, 2019, is encoded as $(h_t,d_t)=(0.6389,0.8571)$.
+
+Traditional methods typically concatenate the time encoding directly with node features and learn the result end-to-end. This implicit treatment can improve the expressive power of static graphs. In dynamic graph scenarios, it may, however, conflate temporal variation with changes in graph structure and thus with the mechanism of information propagation~(\cite{jin2022neural}). Dynamic graphs at different times of the same day have different impacts on flows, as shown in Figures~\ref{fig331} and~\ref{fig332}. Our proposed explicit modulation method integrates time encoding into the dynamic graph by modeling independently how temporal variation alters the graph's aggregation and diffusion strength. By separating temporal effects at the structural level, the method is naturally suited to model propagation mechanisms at different times and to learn spatiotemporal dependencies among station features. The procedure proceeds in three steps.
+
+\paragraph{Step 1} Concatenate the time features into a two-dimensional vector
+\begin{equation}
+T(t)=[h_t,d_t], T(t)\in\mathbf{R}^{N\times 2}
+\end{equation}
+\paragraph{Step 2} Map the time feature $T(t)$ to a scalar via a linear transformation and expand it to the graph level
+\begin{equation}
+E(t)=expand(w\cdot T(t)+b), E(t)\in\mathbf{R}^{N\times N}
+\end{equation}
+\paragraph{Step 3} Modulate the graph matrix $G_t$ with the transformed time feature to control the strength of aggregation or diffusion on the graph
+\begin{equation}
+\hat{G}_t = E(t)\odot G_t,  \hat{G}_t\in\mathbf{R}^{N\times N}
+\end{equation}
+
+\subsubsection{Dynamic Diffusion Process Based on the Time Period Shared Predefined Graph}
+
+\cite{wu2019graph} first modeled traffic flow as a diffusion process. A diffusion process simulates the movement of matter or information from regions of high concentration to regions of low concentration. On a graph, this movement can be interpreted as information propagation between nodes and this propagation is controlled by the adjacency matrix or its normalized variant. The graph used in that work is a static graph predefined by geographic distance and therefore cannot fully reflect the evolving relations between stations. To address this limitation, we construct a dataset of dynamic adjacency matrices to simulate a time-varying diffusion process.
+
+When building the datasetwe incorporated predefined dynamic adjacency matrices based on state update algorithms. Recognizing that dynamic adjacency matrices may undergo significant changes within adjacent time steps, potentially undermining prediction stability, we propose an aggregation strategy. Concretely, we aggregate edges and their weights across multiple time points so that each training sample shares a single, unified dynamic graph structure over the whole temporal range. This approach reduces noise introduced by the stochasticity of cycling records. Each training sample spans multiple time steps and the shared dynamic graph better captures and represents long-range spatio-temporal dependencies.
+
+\begin{breakablealgorithm}
+    \caption{Dynamic Adjacency Matrix Generation Algorithm}\label{alg:time_graphs}
+    \begin{algorithmic}[1]
+    \REQUIRE Cyclic record data: $data$, \text{Time slide}: $\text{slide}$ 
+    \ENSURE Dynamic graph dictionary $time\_graphs$
+    
+    \STATE Initialize dictionary $time\_graphs \gets \{\}$
+    
+    \FOR{$current\_time \in time\_list$}
+        \STATE Initialize graph $G$
+        \STATE Filter records within current time slot: \\
+        \raggedright
+        $filtered\_data \leftarrow data\bigl[(data[return\_time] > current\_time) \land \allowbreak ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        (data[borrow\_time] < current\_time + interval)\bigr]$
+        \FOR{record $(index, row) \in filtered\_data$}
+            \IF{$borrow\_time < current\_time$ and $return\_time < current\_time + \text{slide}$}
+                \STATE $ Add\_or\_update\_edge(G, 0, end\_station)$
+            \ELSIF{$borrow\_time < current\_time$ and $return\_time > current\_time + \text{slide}$}
+                \STATE $Add\_or\_update\_edge(G, 0, end\_station)$
+            \ELSIF{$borrow\_time \geq current\_time$ and $return\_time \leq current\_time + \text{slide}$}
+                \STATE $Add\_or\_update\_edge(G, start\_station, end\_station)$
+            \ELSIF{$borrow\_time > current\_time$ and $return\_time > current\_time + \text{slide}$}
+                \STATE $Add\_or\_update\_edge(G, start\_station, 0)$
+            \ENDIF
+        \ENDFOR
+        \STATE $time\_graphs[current\_time] \gets G$
+    \ENDFOR
+    \RETURN $time\_graphs$
+    \end{algorithmic}
+\end{breakablealgorithm}
+
+In graph structures diffusion process is commonly modeled by the random walk concept. A random walk describes a process that departs from a node and moves probabilistically along edges according to their weights. This process is described by a row-normalized adjacency matrix so that the departure probabilities from each node sum to one. After obtaining the dynamic adjacency matrix $A_t$, we form a forward diffusion matrix $Pf_t$ and a backward diffusion matrix $Pb_t$ and combine them with the time embedding to complete the graph convolution. The dynamic diffusion proceeds as follows.
+
+\paragraph{Step 1} Compute the diffusion matrices
+\begin{equation}
+Pf_t = \frac{A_t}{A_t+\varepsilon}, \quad Pb_t = \frac{A_t^\top}{A_t^\top+\varepsilon}.
+\end{equation}
+Here $Pf_t[i,j]$ denotes the probability of transition from node $i$ to node $j$, while $Pb_t[i,j]$ denotes the probability of transition from node $j$ to node $i$. The diffusion matrices govern how information spreads from the current node to its neighbors.
+
+\paragraph{Step 2} Modulate the diffusion matrices with the time embedding
+\begin{align}
+    & \hat{Pf}_t = E_t\odot Pf_t,\\
+    & \hat{Pb}_t = E_t\odot Pb_t.
+\end{align}
+
+\paragraph{Step 3} For each diffusion order $k$, compute the forward diffusion and backward diffusion of the current time-step graph signal $X_t=x[:,:,:,t]$ respectively:
+\begin{align}
+& For_t^k = \hat{Pf}_t^k\cdot X_t\cdot W_k^f,\\
+& Back_t^k = \hat{Pb}_t^k\cdot X_t\cdot W_k^b.
+\end{align}
+
+\paragraph{Step 4} Sum the diffusion results for each order to integrate information from different hops of neighbors.
+\begin{equation}
+Y_t = \sum_{k=0}^{K-1} \left( \hat{Pf}_t^k \cdot X_t \cdot W_k^f + \hat{Pb}_t^k \cdot X_t \cdot W_k^b \right).
+\end{equation}
+
+\paragraph{Step 5} Concatenate the results across all time steps and apply a ReLU activation
+\begin{equation}
+Y = \mathrm{ReLU}\bigl(\mathrm{concat}(Y_1, Y_2, \dots, Y_T)\bigr).
+\end{equation}
+
+
+\noindent {\bf Note 2}: During diffusion learning, flow variations differ across nodes. Some nodes may lack cycling records for extended periods, while others produce dozens or hundreds of records within a single time window. This reflects varying node importance. Our dynamic graph contains edge weights, and for this reason, we do not introduce an attention mechanism in this component. Edge weights already provide differentiated emphasis on nodes and this choice helps reduce the model's parameter learning requirements.
+
+\subsubsection{Dynamic Aggregation Process Based on Graph Structure Generation}
+
+The introduction of a dynamic adjacency matrix dataset allows explicit learning of inter-node relations. However, this expert-knowledge-based approach may negatively impact the training process. To balance that effect and provide graph structures at multiple temporal scales, we propose a graph structure generation algorithm. The algorithm incorporates the graph de-smoothing structure proposed in~\cite{wu2020connecting} and modulates the generated graph with the time embedding. The dynamic aggregation proceeds as follows.
+
+\paragraph{Step 1} Graph convolution based on the static adjacency matrix. Given a predefined static adjacency matrix, transform features by a first-order graph approximation
+\begin{equation}
+DF_t = \theta_{\star A}(F_t),
+\end{equation}
+where $\theta_{\star A}(\cdot) = \theta\tilde{D}^{-1/2} \tilde{A} \tilde{D}^{-1/2}\cdot$ denotes the graph convolution operation, and $F_t=x[:,:,:,t]$ represents node information at time $t$. $\theta\in \mathbf{R}^{C\times d}$.
+
+\paragraph{Step 2} Dynamic node embedding. Generate learnable source and target node embeddings $E_1$ and $E_2$ via an embedding, where $E_1,E_2\in\mathbf{R}^{N\times d}$. Then compute the element-wise (Hadamard) product of $DF_t$ and $E$, followed by tanh activation.
+\begin{align}
+& DE_t^1=\tanh(\alpha(DF_t\odot E_1)),\\
+& DE_t^2=\tanh(\alpha(DF_t\odot E_2)),
+\end{align}
+where $\alpha$ is a learnable scaling factor.
+
+\paragraph{Step 3} Dynamic adjacency generation. Build a dynamic adjacency matrix from the dynamic node embeddings
+\begin{equation}
+A_t = \mathrm{Softmax}\bigl(\mathrm{ReLU}\bigl(DE_t^1 (DE_t^2)^\top\bigr)\bigr).
+\end{equation}
+Further, by adopting the graph de-smoothing structure, we obtain a first-order Chebyshev-like graph convolution operator. Let $\tilde{D}_t$ be the degree matrix of $A_t+I$. Then
+\begin{equation}
+B_t = \tilde{D}_t^{-1}(A_t+I).
+\end{equation}
+
+\paragraph{Step 4} Time modulation. Modulate the generated adjacency with the time encoding
+\begin{equation}
+\hat{B}_t = E_t \odot B_t.
+\end{equation}
+
+\paragraph{Step 5} Dynamic graph convolution. Apply the modulated dynamic adjacency to the graph signal $X_t = x[:,:,:,t]$ to realize aggregation on the graph.
+\begin{equation}
+Z_t = \hat{B}_t \cdot X_t \cdot W,
+\end{equation}
+where $W$ is the feature transformation matrix. Finally, concatenate the outputs across time steps and apply a ReLU activation
+\begin{equation}
+Z = \mathrm{ReLU}\bigl(\mathrm{concat}(Z_1, Z_2, \dots, Z_T)\bigr).
+\end{equation}
+
+\noindent {\bf Note 3}: The dynamic adjacency matrices produced by this procedure also capture temporal dependencies because of the time embedding. Furthermore, since the generated graph originates from data at the current time step, it enables the extraction of spatio-temporal features at different scales compared to predefined dynamic adjacency matrices.
+
+\subsection{PDST-GCN Framework}
+
+The spatio-temporal module incorporates two graph convolution components. One component utilizes a predefined static graph convolution, while the other implements a dynamic graph convolution module. The predefined static spatio-temporal graph convolution extracts spatio-temporal dependencies through a spatio-temporal attention mechanism. 
+
+For the static graph component, we adopt the ASTGCN model proposed in~\cite{guo2019attention}. First, based on the input graph signal $x\in \mathbb{R}^{B\times N \times C \times T}$, we compute the temporal attention matrix $E'\in \mathbb{R}^{B\times T\times T}$ and the spatial attention matrix $S'\in \mathbb{R}^{B\times N\times N}$. The temporal attention is computed as follows:
+\begin{equation}
+\mathbf{S} = V_s \cdot \sigma\left( (x W_1) W_2 (W_3 x)^\top + b_s \right),
+\end{equation}
+\begin{equation}
+S'_{i,j} = \frac{\exp(S_{i,j})}{\sum_{j=1}^{N} \exp(S_{i,j})}.
+\end{equation}
+The spatial attention calculation method is as follows:
+\begin{equation}
+\mathbf{E} = V_e \cdot \sigma\left( (x^T U_1) U_2 (U_3 x) + b_e \right),
+\end{equation}
+\begin{equation}
+E'_{i,j} = \frac{\exp(E_{i,j})}{\sum_{j=1}^{T_{r-1}} \exp(E_{i,j})},
+\end{equation}
+where $W_1\in\mathbb{R}^{T},W_2\in\mathbb{R}^{C\times T},W_3\in\mathbb{R}^{C},V_s,b_s\in \mathbb{R}^{N \times N}$ are learnable parameters associated with spatial attention. $U_1\in\mathbb{R}^{N},U_2\in\mathbb{R}^{C\times N},U_3\in\mathbb{R}^{C},V_e,b_e\in \mathbb{R}^{T \times T}$ are learnable parameters related to temporal attention. $\sigma$ denotes the sigmoid activation function. Spatial attention dynamically models spatial correlations between nodes to adjust the adjacency matrix. Temporal attention models the importance across different time steps to adjust the weights of input features along the temporal dimension. 
+
+These two attention matrices are respectively combined with graph convolutions and temporal convolutions, where the graph convolution portion corresponds to the following expression:
+\begin{equation}
+\theta_{K\star A}(x)= \sum_{k=0}^{K-1} \theta_k T_k(\tilde{L}\odot S')x,
+\end{equation}
+where $\tilde{L}=\frac{2}{\lambda_{\max}}L-I_N$, $L=I_N-D^{-1/2}AD^{-1/2}$. $D$ is the degree matrix of the predefined adjacency matrix $A$. Further integrating the temporal attention component:
+\begin{equation}
+st\_gcn\_1 = ReLU(\theta_{K\star A}(X\cdot E')),
+\end{equation}
+
+The static spatio-temporal graph convolution extracts spatio-temporal dependencies by applying attention to the graph signal, but it relies on a single static adjacency matrix and thus cannot adapt dynamically to capture complex time-varying spatial relations. To address this limitation, we designed a dynamic spatiotemporal graph module by combining time coding with different time scales to obtain dynamic spatial dependencies. 
+
+Concretely we have
+\begin{align}
+& st\_gcn\_2 = \theta_{K\star A_t^{pre}}(x),\\
+& st\_gcn\_3 = \theta_{\star A_t^{gen}}(x).
+\end{align}
+where $\theta_{K\star A_t^{pre}}$ denotes the time period shared predefined dynamic graph convolution, and $\theta_{\star A_t^{gen}}$ denotes the dynamic graph convolution based on graph generation. A gating mechanism is applied to the three convolution outputs to retain useful signals and suppress noise.
+\begin{equation}
+st\_i = \sigma(W_g\cdot st\_gcn\_i)
+\end{equation}
+Then, concatenate the results of the three gated convolutions and use a temporal convolution to capture temporal dependencies.
+\begin{equation}
+H\_time = \text{Conv2D}(\text{concat}[st\_1, st\_2, st\_3])
+\end{equation}
+Finally, residual connections are used to preserve the original information of the input features, and output features are generated through layer normalization and a smooth activation function.
+\begin{equation}
+H\_output = \text{Layer\_Norm}\bigl(\text{ReLU}(\text{Conv2D}(X)+H\_time)\bigr)
+\end{equation}
+
+By combining the spatio-temporal dynamic graph module with the physics-guided module, we construct the PDST-GCN framework for forecasting station inventory. The figure below depicts the PDST-GCN architecture and the internal structure of the spatio-temporal dynamic graph module.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=6.2 in, height=5.5 in]{images/PDSTGCNzong.png}
+    \caption{\label{fig341}PDST-GCN Framework}
+\end{figure}
+
+\subsection{Robust Optimization Model}
+
+To verify the accuracy of the prediction model and its application in real-world scenarios, we designed a robust optimization rebalancing model based on the prediction results and established an uncertainty set based on the model's prediction results.
+
+\subsubsection{Model Parameters}
+
+\begin{table}[H]
+\centering
+\caption{\label{tab1} Notation}
+\begin{tabular}{cll}
+\hline
+\textbf{Set} & \textbf{} \\
+\hline
+$N$ & \text{Set of stations excluding depots}\\
+$V$ & \text{Set of stations including depots} \\
+$A$ & \text{Set of edges} \\
+$K$ & \text{Set of rebalancing trucks} \\
+$U$ & \text{Set of demand uncertainty} \\
+\hline
+\textbf{Parameters} & \textbf{} \\
+\hline
+$p_i$ & \text{Predicted number of bikes at station $i$} \\
+$e_i$ & \text{Expected number of bikes at station $i$} \\
+$b_i$ & \text{Current number of bikes at station $i$} \\
+$d_i$ & \text{Rebalancing demand at station $i$} \\
+$p_i$ & \text{Penalty coefficient for deviation from expected bikes at station $i$} \\
+$c_{ij}$ & \text{Travel cost for a truck from station $i$ to station $j$} \\
+$Q$ & \text{Maximum capacity of a truck} \\
+$\lambda^+$ & \text{Penalty coefficient for unmet drop-off demand} \\
+$\lambda^-$ & \text{Penalty coefficient for unmet pickup demand} \\
+$s_i^+$  & \text{Unmet positive (drop-off) demand at node $i$}\\
+$s_i^-$  & \text{Unmet negative (pickup) demand at node $i$}\\
+\hline
+\textbf{Variables} & \textbf{} \\
+\hline
+$x_{ij}^k$ & \makecell[l]{Binary variable equal to 1 if truck $k$ travels from station $i$ \\ to station $j$, otherwise 0} \\
+$y_i^{k}$ & \text{Number of bikes that truck $k$ drops off or picks up at station $i$} \\
+$L_i^k$ & \text{Number of bikes on truck $k$ when at station $i$} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Establishing Robust Model}
+To mitigate service shortfalls and rebalancing risks induced by demand forecasting errors and operational uncertainties, we formulate a two-stage robust optimization model. In the first stage, vehicle routing decisions are made before demand realization: routes are chosen to minimize routing cost subject to standard route feasibility constraints. In the second stage, after the uncertain demand materializes within an uncertainty budget set $\mathcal{U}$, the model adjusts the quantities delivered or collected along the pre-determined routes to minimize unmet demand. The worst-case second-stage cost is taken as the risk measure for first-stage decisions, thereby providing a principled trade-off between route cost and robust service level.
+
+First-stage:
+\begin{equation}\label{ques1}
+\min_{x} \sum_{k\in K}\sum_{i\in V}\sum_{j\in V}c_{ij}x_{ij}^k
+\end{equation}
+
+s.t. 
+\begin{equation}\label{cons1}
+    \sum_{k\in K}\sum_{j\in V}x_{ij}^k = 1, \forall i\in N, i\neq j,
+\end{equation}
+\begin{equation}\label{cons111}
+    \sum_{k\in K}\sum_{i\in V}x_{ij}^k = 1, \forall j\in N, i\neq j,
+\end{equation}
+\begin{equation}\label{cons2}
+    \sum_{j\in V}x_{0j}^k = 1, \forall k\in K,
+\end{equation}
+\begin{equation}\label{cons3}
+    \sum_{i\in V}x_{i0}^k = 1, \forall k\in K,
+\end{equation}
+\begin{equation}\label{cons4}
+    \sum_{i\in V}x_{ih}^k-\sum_{j\in V}x_{hj}^k= 0, \forall h\in V, \forall k\in K,
+\end{equation}
+\begin{equation}\label{cons5}
+    \mu_{ik}-\mu_{jk}+Nx_{ij}^k\leq N-1, \forall k\in K, i,j\in V, i\neq j,
+\end{equation}
+\begin{equation}\label{cons6}
+    x_{ij}^k\in\{0,1\}, \forall i,j\in V_0, i\neq j, \forall  k\in K.
+\end{equation}
+
+Constraints (\ref{cons1}) and (\ref{cons111}) enforce that each node is visited exactly once. Constraints (\ref{cons2}) -~(\ref{cons3}) require that every vehicle departs from and returns to the depot. Constraint (\ref{cons4}) is the flow conservation constraint ensuring that, for each vehicle and node, the number of arrivals equals the number of departures. Constraint (\ref{cons5}) eliminates sub-trips via the classical MTZ formulation. Constraint (\ref{cons6}) defines binary routing variables.
+
+Second-stage:
+\begin{equation}\label{ques2}
+    Q(x,d)=\min_{y,s} \sum_{i\in V}\lambda^+s_i^+ +\lambda^-s_i^- 
+\end{equation}s.t. 
+\begin{equation}\label{cons7}
+    \sum_{k\in K}y_i^{k}+s_i^+ - s_i^- =d_i,
+\end{equation}
+\begin{equation}\label{cons8}
+    L_j^k=L_i^k-y_i^{k}, \forall k\in K,~\text{if}~ x_{ij}^k=1,
+\end{equation}
+\begin{equation}\label{cons9}
+    0\leq L_i^k\leq Q, \forall k\in K,
+\end{equation}
+\begin{equation}\label{cons10}
+    L_0^k= 0, \forall k\in K,
+\end{equation}
+\begin{equation}\label{cons11}
+    -Q\sum_{i\in V}x_{ji}^k\leq y_i^{k}\leq Q \sum_{i\in V}x_{ji}^k,\forall i\in V,\forall k\in K,
+\end{equation}
+\begin{equation}\label{cons12}
+    y_i^{k}\in \mathbb{R} , s_i^+ \geq 0, s_i^-\geq 0, \forall i\in V,\forall k\in K.
+\end{equation}
+Here $\lambda^+$ and $\lambda^-$ are penalty coefficients for unmet positive and negative demand, respectively; while $s_i^+,s_i^-$ represent the positive and negative unmet demand at node $i$. Variable $y_i^k$ denotes the number of bikes delivered to (positive) or collected from (negative) node $i$ by vehicle $k$. $L_i^k$ is the load carried by vehicle $k$ immediately after visiting node $i$. Constraint (\ref{cons7}) enforces that the sum of delivered/collected quantities across vehicles, plus unmet demand, equals the realized demand at each node. Constraint (\ref{cons8}) updates vehicle capacity constraints along an arc $(i,j)$ visited by vehicle $k$. Constraint (\ref{cons9}) enforces vehicle capacity limits.~(\ref{cons10}) specifies that vehicles depart the depot empty. Constraint (\ref{cons11}) indicates that deployment or retrieval operations occur only when node $i$ is visited; otherwise $y_i^k$ is forced to zero by the multiplier $\sum_{i\in V} x_{ji}^k$. Finally, constraint (\ref{cons12}) is a non-negativity constraint on the variables.
+
+The two-stage robust optimization problem takes the following form.
+\begin{equation}\label{ques3}
+    \min_x \sum_{k\in K}\sum_{i\in V}\sum_{j\in V}c_{ij}x_{ij}^k + \max_{d\in \mathcal{U}} Q(x,d)
+\end{equation}
+
+Using historical records and the current bike count at each station $b_i$, the forecast model produces a forecast $p_i$ for the number of bikes at each station in the next time step. Given a fixed target inventory $e_i$ at each station, the expected net demand at station $i$ is defined as $d_i=p_i-e_i$. Forecast error in $p_i$ therefore induces uncertainty in $d_i$. To account for this uncertainty, we construct an uncertainty set for the demand $d_i$.~\cite{zhao2025research} and earlier studies adopt budgeted absolute constraints to describe inventory deviations, typically of the form $\sum_{i\in V}(\Delta_i^+ + \Delta_i^-)\le \Gamma$. This formulation delivers conservative protection against worst-case deviations, but it neglects the interdependence of inventory changes across stations.
+
+To capture such dependence, we exploit the system-level conservation of bikes over short time horizons. Building on the conventional budgeted uncertainty set, we introduce an additional constraint on the total demand error to reflect correlation among station errors. Because the total number of bikes remains effectively constant over short intervals, an increase in inventory at one station can coincide with a decrease at another station. Denote by $r_i^t$ the number of bikes at station $i$ at time $t$ and by $r_0^t$ the number of bikes in transit at the system scale at time $t$. Fleet conservation is enforced by
+\begin{equation}\label{ques4}
+    \sum_{i\in V} r_i^t + r_0^t=N_b, ~~
+    \sum_{i\in V} r_i^{t+1} + r_0^{t+1}=N_b,
+\end{equation}
+where $N_b$ denotes the total number of bikes in the system. The additional constraint couples station-level errors through the global inventory balance and thereby reduces overly conservative allocations that ignore mass conservation.
+
+From
+\begin{equation}
+   r_i^{t+1} = p_i^{t+1} + \tilde{p}_i^{t+1}, ~~\forall i\in \{0\}\cup N,
+\end{equation}  we derive the prediction error identity for mesoscopic in-transit nodes:
+\begin{equation}
+   \sum_{i\in V} (p_i^{t+1} + \tilde{p}_i^{t+1}) + p_0^{t+1} + \tilde{p}_0^{t+1} = N_b,
+\end{equation} 
+\begin{equation}
+    \sum_{i\in V} \tilde{p}_i^{t+1} =- \tilde{p}_0^{t+1},
+\end{equation}  
+where $\tilde{p}_i^{t+1}$ and $\tilde{p}_0^{t+1}$ denote the prediction errors at time $t+1$ for site $i$ and mesoscopic in-transit node, respectively. The gray site in Figure~\ref{fig351} represent the virtual mesoscopic in-transit node.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=4.5 in, height=2.3 in]{images/yuceshiyi2.png}
+    \caption{\label{fig351} Schematic of robust control for mesoscopic in-transit node prediction error}
+\end{figure}
+
+We therefore construct the following uncertainty set to impose a relative constraint on total demand error.
+\begin{equation}
+    \mathcal{U}=\biggl\{d|d_i = \bar{d}_i+\Delta_i,\Delta_i\in[-\epsilon_i^-,\epsilon_i^+],\sum_{i\in V} |\Delta_i | \leq \Gamma ,\sum_{i\in V}\Delta_i\in [-\delta,\delta] \biggr\}.
+\end{equation} 
+Here $\bar{d}_i$ denotes the nominal demand at node $i$ and $\Delta_i$ denotes its deviation. The parameters $\epsilon_i^-$ and $\epsilon_i^+$ bound the local forecast error at station $i$. The budget parameter $\Gamma$ limits the aggregate magnitude of deviations in the usual budgeted uncertainty sense. The additional parameter $\delta$ represents the forecast error of the number of bikes in the mesoscopic in-transit node. The final constraint requires that the algebraic sum of station-level errors is controlled within the interval $[- \delta,\delta]$ by the in-transit inventory. This coupling enforces mass conservation across the network and trims the conventional budgeted uncertainty set, which tends to be overly conservative when inter-node correlations are present. Under mild regularity conditions, the set $\mathcal{U}$ can be shown to be a subset of the standard budget set (see~\ref{ap1}, Proposition~\ref{prop:U1_subset_U2}). This reduction in feasible deviations yields more flexible rebalancing actions while maintaining protection against plausible worst-case realizations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=6 in, height=2.5 in]{images/qiegeji.png}
+    \caption{\label{fig352}Schematic of relative constraints}
+\end{figure}
+
+Compared with uncertainty sets that rely only on budget constraints, our method imposes a global deviation bound via the mesoscale in-transit node's inventory. This construction rules out implausible extreme error combinations and thereby yields a substantial reduction in worst-case cost. At the same time, the uncertainty set preserves a polyhedral form and thus maintains polynomial-time solvability. The result is a more flexible and practically grounded robust optimization scheme that offers stronger protection against realistic demand fluctuations without incurring excessive conservatism.
+
+\section{Case Study}
+
+This section reports an empirical analysis based on a real-world dataset. We begin by preprocessing raw bike-share trip records and constructing a station-level inventory dataset using the mesoscale in-transit node structure and the data reconstruction framework proposed in this study. Section 4.2 describes the baseline models and presents experimental comparisons that evaluate the predictive performance of our approach. In Section 4.3, we utilize the forecasts to construct robust uncertainty sets subject to relative constraints, and then employ numerical examples to assess the structural validity of the proposed mesoscale in-transit node representation.
+
+\subsection{Data Description and Experimental Settings}
+
+The dataset originates from Citi Bike trip records for New York City and was downloaded from the system archive at (https://s3.amazonaws.com/ tripdata/index.html). The observation window covers the period from August 1, 2019, to September 30, 2019. Each trip entry contains a unique bike identifier together with origin and destination stations and the corresponding start and end timestamps. The dataset total comprises 97,955 trip instances. We used the trips collected in August 2019 to infer the initial distribution of bikes at the beginning of September. The remaining 49,244 trips from September were reserved for constructing and evaluating the deep learning framework. The September data were split according to a 6: 2: 2 ratio into training, validation and test sets to ensure a comprehensive and unbiased assessment of model performance. Temporal aggregation was performed at a five-minute resolution. The forecasting task aims to predict the spatial distribution of bikes over the next hour based on the preceding hour of observations. In discrete time, this corresponds to using the previous 12 consecutive time steps to predict the following 12 consecutive time steps.
+
+We compare PDST-GCN with nine baseline methods to assess its spatiotemporal modeling ability and robustness.
+
+
+\begin{itemize}
+    \item STGCN: Combines graph convolutional networks with temporal convolutional networks and employs a Chebyshev polynomial approximation for spatial filtering, which captures spatial correlations among neighboring nodes and models short-term temporal dependencies.
+    \item ASTGCN: Extends the spatiotemporal graph convolution framework by introducing a spatial attention mechanism that dynamically weights influences between nodes and improves representation of complex spatial dynamics.
+    \item Graph WaveNet: Constructs a learnable adaptive adjacency matrix from node embeddings to discover latent spatial relations and uses stacked dilated causal convolutions to enlarge the temporal receptive field while avoiding gradient issues of recurrent networks.
+    \item MTGNN: Targets scenarios with unknown graph structure and demonstrates the effectiveness of learning graph topology, unifying graph structure learning and spatiotemporal prediction within a single framework.
+    \item AGCRN: Forms embeddings at both the graph level and the node level to perform graph convolution and adapts the graph structure during training, thereby shifting from manually defined spatial relations to data-driven dynamic reconstruction.
+    \item DGCRN: Integrates dynamic graph generation into an RNN framework by using node flow, temporal cues and hidden states to generate graph structures on the fly, and adopts a curriculum learning strategy to improve training efficiency.
+    \item D2STGNN: Proposes a decoupled spatiotemporal framework that separates diffusive signals from intrinsic signals in traffic data, models them independently and then fuses their outputs for prediction, supported by diffusion, intrinsic and dynamic graph learning modules.
+    \item STWave: Introduces a wavelet-based decoupling mechanism that explicitly separates trend components from event-driven components, and combines spectral attention with an adaptive fusion scheme to enhance robustness in nonstationary settings.
+    \item STPGNN: Incorporates a key node identification module and a focused graph convolution module to model structurally important locations in transportation networks, which improves representation of complex spatiotemporal dependencies.
+\end{itemize}
+
+\subsection{Prediction Performance}
+
+In this section, we evaluate the overall predictive accuracy of the proposed model in comparison with the baseline approaches. Model performance is assessed using three widely adopted error metrics, namely mean absolute error, root mean square error, and mean absolute percentage error. These measures are defined as follows:
+
+\begin{equation}
+    \text{MAE} = \frac{1}{N} \sum_{i=1}^{N} | y_i - \hat{y}_i |,
+\end{equation}
+
+\begin{equation}
+    \text{RMSE} = \sqrt{ \frac{1}{N} \sum_{i=1}^{N} ( y_i - \hat{y}_i )^2 },
+\end{equation}
+
+\begin{equation}
+    \text{MAPE} = \frac{1}{N} \sum_{i=1}^{N} \left| \frac{ y_i - \hat{y}_i }{ y_i } \right|,
+\end{equation}
+where $y_i$ is the actual value, $\hat{y}_i$ is the predicted value, and $N$ is the total number of observations.
+
+Table~\ref{tab2} displays the prediction accuracy of our proposed model and other benchmark models. For each metric, the model with the best performance is indicated in bold typeface, while the next best performer is underlined.
+
+\begin{table}[H]
+    \centering
+    \caption{\label{tab2} Comparison of PDST-GCN and baselines.}
+    \begin{tabular}{lcccc}
+    \hline
+    \textbf{Model} & \textbf{MAE} & \textbf{RMSE} & \textbf{MAPE} \\
+    \hline
+    STGCN (2018) & 0.97 & 1.95 & 0.20 \\
+    ASTGCN (2019) & 0.73 & 1.77 & 0.15 \\
+    Graph WaveNet (2019) & 0.63 & 1.38 & 0.13 \\
+    MTGNN (2020) & 0.72 & 1.42 & 0.18 \\
+    AGCRN (2020) & 0.63 & 1.42 & 0.16 \\
+    DGCRN (2021) & 0.70 & 1.59 & 0.14 \\
+    D2STGNN (2022) & 0.66 & 1.46 & 0.13 \\
+    %STJGCN(2024) & 0.86 & 1.61 & 0.15 \\
+    STWave (2023) & \underline{0.62} & \underline{1.36} & \underline{0.12} \\
+    STPGNN (2024) & \underline{0.62} & 1.42 & 0.13 \\
+    PDST-GCN (this paper) & {\bf 0.57} & {\bf 1.31} &  \bf{0.12} \\
+    \hline
+    \end{tabular}
+\end{table}
+
+Overall, measured by predictive accuracy, the proposed model outperforms the baseline methods on the dataset. Notably, it achieves meaningful improvements in mean absolute error and root mean square error. Ablation experiments were conducted to quantify the contribution of each component, and the results are reported in Table~\ref{tab3}. These findings validate the effectiveness of the proposed modules and highlight the physics-guided module as a key driver of the observed gains in forecasting accuracy.
+
+\begin{table}[H]
+    \centering
+    \caption{\label{tab3} Ablation Study }
+    \begin{tabular}{lcccc}
+    \hline
+    \textbf{Model} & \textbf{MAE} & \textbf{RMSE} & \textbf{MAPE} \\
+    \hline
+    Base & 0.73 & 1.77 & 0.15 \\
+    Physic Model & 0.61 & 1.47 & 0.13 \\
+    Dynamic graph1 & 0.59 & 1.43 & 0.12 \\
+    Dynamic graph2 & {\bf 0.57} & {\bf 1.31} & {\bf 0.12} \\
+    \hline
+    \end{tabular}
+\end{table}
+
+To further assess the physical plausibility of the forecasts, we aggregated the predicted bike counts produced by the models and compared these totals with the observed inventory. Figure 9 displays the time series of total bikes across all nodes over the forecast horizon, with the empirical totals shown together with predictions from the proposed method and the baselines. The proposed model tracks the empirical totals more closely than the competing methods and exhibits smaller deviations over time. This behaviour indicates that the model better preserves system-level quantities and avoids systematic drift in the predicted fleet size. The result reinforces the physical interpretability of the mesoscale in-transit node representation and supports the effectiveness of the physics-guided module for producing physically consistent forecasts.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=5 in, height=2.3 in]{images/nodesum.png}
+    \caption{\label{fig421}Total number of bikes across all nodes at forecasted time steps}
+\end{figure}
+
+\subsection{Robust Optimization Model Solution}
+This section uses a Column \& Constraint Generation (C\&CG) algorithm framework to solve the robust optimization model introduced in Section 3.5. We construct data-driven demand uncertainty sets from the proposed prediction model, with the resulting formulations solved by the commercial solver Gurobi. 
+\subsubsection{C\&CG for two-stage robust optimization}
+As the two-stage robust optimization problem adopts a min-max structure, we apply the column-and-constraint generation method to decompose it into a master problem and a subproblem.
+\begin{equation}
+    \min_{x\in X} \left\{ \text{Cost}_1(x) + \max_{d \in \mathcal{U}} Q(x,d) \right\},
+\end{equation}
+where the first-stage cost is defined as
+\begin{equation}
+    \text{Cost}_1(x) = \sum_{k\in K}\sum_{i\in V}\sum_{j\in V} c_{ij} \, x_{ij}^k,
+\end{equation}
+where $X$ denotes the feasible region that incorporates path constraints, flow balance constraints and subtour elimination constraints. The derivation of the C\&CG algorithm is provided in~\ref{ap2}. By combining the first-stage cost with the dual representation of the second-stage problem, the overall problem is equivalent to the following formulation.
+\begin{equation}
+\min_{x \in X} \left\{ \sum_{k\in K}\sum_{i\in V}\sum_{j\in V}c_{ij}x_{ij}^k + \max_{\pi\in \Pi(x)} \left[ \sum_{i\in V} \pi_i\, \bar{d}_i - \Psi(x,\pi) + \sigma(\pi) \right] \right\}.
+\end{equation}
+
+The following is the C\&CG algorithm iteration process.
+\begin{breakablealgorithm}
+\caption{(C\&CG) for two-stage robust optimization}\label{alg:ccg}
+\begin{algorithmic}[1]
+\textbf{Initialize} Set iteration counter $t \gets 0$, lower bound $LB \gets -\infty$, upper bound $UB \gets +\infty$ and tolerance $\epsilon > 0$. Generate an initial dual solution $\pi^0$. Initialize the master problem and add the initial cut $\eta \geq \sum_{i \in V} \pi_i^0 \bar{d}_i - \Psi(x, \pi^0) + \sigma(\pi^0)$.
+
+\WHILE{$UB - LB > \epsilon$}
+    \STATE \textbf{Step 1. Solve the master problem}
+    \[
+    \begin{aligned}
+    \min_{x,\eta} \quad & \sum_{k \in K} \sum_{i\in V}\sum_{j\in V} c_{ij} x_{ij}^k + \eta \\
+    \text{s.t.} \quad & \eta \geq \sum_{i \in V} \pi_i^r \bar{d}_i - \Psi(x, \pi^r) + \sigma(\pi^r), \quad r = 0,\dots,t \\
+    & x \in X
+    \end{aligned}
+    \] 
+    \STATE Obtain the optimal solution $(x^{t+1}, \eta^{t+1})$ and the master objective value $obj_{\text{master}}$, then update the lower bound $LB$.
+    \STATE \textbf{Step 2. Fix $x = x^{t+1}$ and solve the subproblem}
+    \[
+    \theta(x^{t+1}) = \max_{\pi \in \Pi(x^{t+1})} \left\{ \sum_{i \in V} \pi_i \bar{d}_i - \Psi(x^{t+1}, \pi) + \sigma(\pi) \right\}
+    \]
+    \STATE Obtain the optimal dual solution $\pi^{t+1}$ and the optimal value $\theta^{t+1}$.
+    \STATE Compute a candidate upper bound: $cand_{UB} \gets \sum_{k \in K} \sum_{i\in V}\sum_{j\in V} c_{ij} x_{ij}^{k,(t+1)} + \theta^{t+1}$. Update the upper bound $UB \gets \min\{UB,\,cand_{UB}\}$. 
+    \IF{$\theta^{t+1} > \eta^{t+1} + \epsilon$}
+        \STATE Compute $\sigma(\pi^{t+1}) = \max_{\Delta \in \mathcal{U}} \sum_{i \in V} \pi_i^{t+1} \Delta_i$
+        \STATE Compute the constant term: $const \gets \sum_{i \in V} \pi_i^{t+1} \bar{d}_i + \sigma(\pi^{t+1})$
+        \STATE Generate a new cut:
+        \[\eta \geq const - \Psi(x, \pi^{t+1})\]
+        \STATE Add the new cut to the master problem.
+        \STATE $t \gets t + 1$
+    \ELSE
+        \STATE \textbf{break} \COMMENT{Converged}
+    \ENDIF
+\ENDWHILE
+
+\STATE \textbf{Output} Optimal paths $x^* = x^{t+1}$ and final lower bound $LB$.
+\end{algorithmic}
+\end{breakablealgorithm}
+
+\subsubsection{Robust Uncertainty Set Construction and Solution}
+Conventional robust optimization methods typically rely on fixed and uniform uncertainty parameters, which can produce solutions that are overly conservative and inefficient. To address this limitation and to exploit the complex spatiotemporal dependencies captured by the proposed model, together with the intrinsic error mechanisms of the mesoscale in-transit node forecasts, we design a data-driven budget uncertainty set.
+\begin{equation}
+    \mathcal{U}=\biggl\{d|d_i = \bar{d}_i+\Delta_i,\Delta_i\in[-\epsilon_i^-,\epsilon_i^+],\sum_{i\in V} |\Delta_i | \leq \Gamma ,\sum_{i\in V}\Delta_i\in [-\delta,\delta] \biggr\}.
+\end{equation}
+
+To demonstrate the practical value of the robust formulation, we derive the uncertainty set from the forecasts produced by our framework. For clarity, we select six stations that display forecast errors and supplement them with four stations that exhibit accurate forecasts so as to maintain supply-demand balance. This choice ensures that the rebalancing problem satisfies empty vehicle dispatch and return constraints and simulates the operational needs of a shared mobility system. Table~\ref{tab4} reports the nominal demand and the deviation bounds for each station, as inferred from historical observations and model outputs.
+\begin{table}[H]
+    \centering
+    \caption{Demand and Deviation at each station}\label{tab4}
+    \begin{tabular}{c|c|c|c}
+    \hline
+    Station & $d\_nom$ & $d\_dev\_minus$ & $d\_dev\_plus$ \\
+    \hline
+    1 & -9.0 & 1.0 & 0 \\
+    2 & -2.0 & 0 & 1.0 \\
+    3 & 9.0 & 0 & 0.0 \\
+    4 & 4.0 & 0 & 2.0 \\
+    5 & 6.0 & 1.0 & 0 \\
+    6 & -7.0 & 0 & 0.0 \\
+    7 & -7.0 & 0 & 0.0 \\
+    8 & 4.0 & 0 & 1.0 \\
+    9 & 5.0 & 0 & 0.0 \\
+    10 & -3.0 & 1.0 & 0 \\
+    \hline
+\end{tabular}
+\end{table}
+
+In the numerical experiments, we set vehicle capacity $Q = 20$, the positive and negative deviation penalty coefficients $\lambda^+ = \lambda^- = 10$, and the total budget uncertainty $\Gamma = 7$. Prediction errors of the mesoscale in-transit node are used to impose the relative constraint $\sum_{i\in V}\Delta_i \leq [0,2]$. Given the small scale of the dataset, we first solve the problem by exhaustive scenario enumeration and then apply the column-and-constraint generation method C\&CG. This baseline approach evaluates all possible scenarios contained in the uncertainty set and provides a reference for algorithmic efficiency and solution quality. Table~\ref{tab5} compares the performance of the scenario enumeration method before and after the inclusion of the relative constraint.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Comparison of Scene Traversal Solutions with and without Relative Constraints}\label{tab5}
+    \begin{tabular}{l|l|l}
+    \hline
+    \textbf{Metrics} & \textbf{Without Relative Constraints} & \textbf{With Relative Constraints} \\
+    \hline
+    \textbf{Scenes} & 96 & 66 \\
+    \hline
+    \textbf{Time (s)} & 193755.6171 & 12201.4671 \\
+    \hline
+    \textbf{Optimal Objective} & 50.4693 & 30.4693 \\
+    \hline
+    \textbf{Optimal theta} & 40.0 & 20.0 \\
+    \hline
+    \end{tabular}%
+\end{table}
+
+Under the conventional uncertainty set, there are 96 scenarios, while the refined uncertainty set contains 66 scenarios. The inclusion of the relative constraint removes approximately 31\% of ineffective scenarios and materially improves solution efficiency. This reduction underscores the value of data-driven constraints for pruning the uncertainty space and achieving more efficient optimization without compromising robustness. To further enhance scalability, we implement the column and constraint generation algorithm C\&CG to solve the model. Table~\ref{tab6} compares the performance of C\&CG before and after the inclusion of the relative constraint.
+
+\begin{table}[H]
+  \centering
+  \caption{Comparison of C\&CG Solutions with and without Relative Constraints}\label{tab6}
+    \begin{tabular}{l|l|l}
+    \hline
+    \textbf{Metrics} & \textbf{Without Relative Constraints} & \textbf{With Relative Constraints} \\
+    \hline
+    \textbf{Time (s)} & 9138.5703 & 820.7016 \\
+    \hline
+    \textbf{Optimal Objective} & 50.4693 & 30.4693 \\
+    \hline
+    \textbf{Optimal theta} & 40.0 & 20.0 \\
+    \hline
+    \end{tabular}%
+\end{table}
+
+After incorporating the relative constraint, computation time decreased by approximately 91\%. The worst-case cost $\theta$ is halved from 40.0 to 20.0. The overall objective decreased from 50.4693 to 30.4693. These improvements demonstrate the practical advantage of the refined uncertainty set in producing solutions that are both more efficient and less conservative. Such gains are important for real-time rebalancing in urban transport networks. Figure~\ref{fig:combined_ccg} presents the vehicle routes generated by the C\&CG algorithm before and after the relative constraint was imposed.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/ccg_no_relative_constraint.png}
+    \caption{Without Relative Constraints}\label{fig431}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/ccg_relative_constraint.png}
+    \caption{With Relative Constraints}\label{fig432}
+  \end{subfigure}
+  \caption{Comparison of C\&CG Solutions with and without Relative Constraints}\label{fig:combined_ccg}
+\end{figure}
+
+Although the route topology remains the same, the number of bikes allocated at each station differs and leads to cost variation as shown in Figure~\ref{fig433}. The experiments show that the proposed forecasting method, together with the mesoscale in-transit node construction, not only improves computational tractability but also yields route plans that adapt better to demand fluctuations. These outcomes reduce operating costs and improve the service reliability of the bike share system.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=4.5 in, height=2.4 in]{images/lujingrongliang.png}
+    \caption{\label{fig433}Path capacities under unconstrained and constrained settings}
+\end{figure}
+
+\section{Conclusion}
+
+This paper combines physics-guided deep learning with robust optimization to improve station-level inventory forecasting and rebalancing decisions in bike- sharing systems. Guided by the operator's practical needs, we shift the prediction target from raw user demand to the bike inventory at each station. By reconstructing original trip records, we create a novel time series of inventory data and introduce a mesoscopic in-transit node concept to achieve precise state localization. This virtual node captures bikes that are in transit and guarantees consistency of inventory counts at temporal snapshots, thereby avoiding spurious fluctuations that commonly affect conventional approaches.
+
+We propose a physics-guided dynamic spatiotemporal graph convolutional network that advances the spatiotemporal modeling paradigm. Time embeddings derived from OD flows are used to build multiscale dynamic graphs that emulate aggregation and dispersion of riding flows. This dynamic graph architecture overcomes the limits of static graphs and captures time-varying interaction strengths among stations. We designed a physics-guided global embedding module that explicitly incorporates physical conservation laws into the learning process, while enhancing prediction feasibility and interpretability through a custom loss function. Empirical evaluation on the New York City Citi Bike dataset demonstrates that PDST-GCN attains clear gains on key metrics. Forecast errors are MAE = 0.57, RMSE = 1.31 and MAPE = 0.12, representing an average improvement of about 8\% over state of the art baselines. Ablation studies confirm that the mesoscopic in-transit node and the physics-guided module are the principal contributors to the accuracy gains.
+
+To translate forecasts into operational decisions, we construct data-driven uncertainty sets and embed them in a two-stage robust optimization model. By generating relative constraints from mesoscopic in-transit node prediction errors, this framework effectively prunes a large number of physically infeasible scenarios, accelerating the solution of the column and constraint generation (C\&CG) algorithm. Compared with an unconstrained benchmark, the proposed framework reduces computation time by roughly 91\% and lowers worst-case cost by nearly 50\%. The resulting rebalancing plans are more flexible and practically applicable. This mechanism narrows the gap between inventory forecasting and decision optimization and ensures that decisions are both accurate and implementable.
+
+The main contribution of this work lies in reconstructing the modeling framework from first principles and the application of the mesoscopic in-transit node to the bike-sharing domain. The proposed approach unifies physical laws with data-driven learning and addresses the persistent disconnect between prediction and optimization found in prior research. The framework is extensible to free-floating bike sharing, shared e-bikes and shared cars, and thus has broader practical relevance for sustainable urban mobility. However, the current framework retains certain limitations, including the need to strengthen robustness under extreme weather and sudden disruptions and to integrate richer multimodal data sources. Future work may pursue an end-to-end integration of forecasting and optimization and extend the framework to multimodal networks, which would help address more complex urban mobility challenges. These directions are expected to further amplify this methodology's impact and to advance the resilience and sustainability of intelligent transport systems.
+
+\section*{CRediT authorship contribution statement}
+\textbf{Zhushi Jin}: Writing - original draft, Writing - review \& editing,  Methodology, Formal analysis, Conceptualization, Software, Validation,  Data curation. \textbf{Zihao Tian}: Writing - review \& editing, Supervision, Methodology, Conceptualization, Funding acquisition. \textbf{Jing Zhou}: Supervision, Validation, Resources. \textbf{LixinTian}: Writing - review \& editing, Supervision, Resources, Project administration. \textbf{David Z. W. Wang}: Validation, Resources.
+
+
+\section*{Acknowledgements}
+The Research was supported by the National Natural Science Foundation of China (Grant No. 72401127), Major programs of the National Social Science Fund of China (Grant No. 22\&ZD136). These supports are gratefully acknowledged.
+
+% \begin{align}
+%  f(x) &= (x+a)(x+b) \\
+%       &= x^2 + (a+b)x + ab
+% \end{align}
+
+% \begin{eqnarray}
+%  f(x) &=& (x+a)(x+b) \nonumber\\ %% If equation numbering is not needed for a row use \nonumber.
+%       &=& x^2 + (a+b)x + ab
+% \end{eqnarray}
+
+% %% Unnumbered versions of align and eqnarray
+% \begin{align*}
+%  f(x) &= (x+a)(x+b) \\
+%       &= x^2 + (a+b)x + ab
+% \end{align*}
+
+% \begin{eqnarray*}
+%  f(x)&=& (x+a)(x+b) \\
+%      &=& x^2 + (a+b)x + ab
+% \end{eqnarray*}
+
+% %% Refer following link for more details.
+% %% https://en.wikibooks.org/wiki/LaTeX/Mathematics
+% %% https://en.wikibooks.org/wiki/LaTeX/Advanced_Mathematics
+
+% %% Use a table environment to create tables.
+% %% Refer following link for more details.
+% %% https://en.wikibooks.org/wiki/LaTeX/Tables
+% \begin{table}[t]%% placement specifier
+% %% Use tabular environment to tag the tabular data.
+% %% https://en.wikibooks.org/wiki/LaTeX/Tables#The_tabular_environment
+% \centering%% For centre alignment of tabular.
+% \begin{tabular}{l c r}%% Table column specifiers
+% %% Tabular cells are separated by &
+%   1 & 2 & 3 \\ %% A tabular row ends with \\
+%   4 & 5 & 6 \\
+%   7 & 8 & 9 \\
+% \end{tabular}
+% %% Use \caption command for table caption and label.
+% \caption{Table Caption}\label{fig1}
+% \end{table}
+
+
+% %% Use figure environment to create figures
+% %% Refer following link for more details.
+% %% https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
+% \begin{figure}[t]%% placement specifier
+% %% Use \includegraphics command to insert graphic files. Place graphics files in 
+% %% working directory.
+% \centering%% For centre alignment of image.
+% \includegraphics{example-image-a}
+% %% Use \caption command for figure caption and label.
+% \caption{Figure Caption}\label{fig2}
+% %% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+% \end{figure}
+
+
+%% The Appendices part is started with the command \appendix;
+%% appendix sections are then done as normal sections
+\appendix
+
+
+\section{Proof of the Proposition}\label{ap1}
+
+\begin{proposition}[Containment of the uncertainty sets]\label{prop:U1_subset_U2}
+Let
+\[
+\mathcal{U}_1
+=\Bigl\{\,d\mid d_i=\bar d_i+\Delta_i,\;
+\Delta_i\in[-\epsilon_i^-,\epsilon_i^+],\;
+\sum_{i\in V}\bigl|\Delta_i\bigr|\le\Gamma,\;
+\sum_{i\in V}\Delta_i\in[-\delta,\delta]\Bigr\},
+\]
+and
+\[
+\mathcal{U}_2
+=\Bigl\{\,d\mid d_i=\bar d_i+\Delta_i,\;
+\Delta_i\in[-\epsilon_i^-,\epsilon_i^+],\;
+\sum_{i\in V}\bigl|\Delta_i\bigr|\le\Gamma\Bigr\}.
+\]
+Assume that \(\Gamma \ge \sum_{i\in V}\epsilon_i^+~\text{and}~0\le\delta<\sum_{i\in V}\epsilon_i^+.\)
+Then~\(\mathcal{U}_1\subsetneq\mathcal{U}_2,\)
+i.e. $\mathcal{U}_1$ is a proper subset of $\mathcal{U}_2$.
+\end{proposition}
+
+\begin{proof}
+Take any \(d\in\mathcal{U}_1\). Its perturbation vector \(\Delta=(\Delta_i)_{i\in V}\) satisfies
+\[
+\Delta_i\in[-\epsilon_i^-,\epsilon_i^+],\qquad
+\sum_{i\in V}|\Delta_i|\le\Gamma,\qquad
+\sum_{i\in V}\Delta_i\in[-\delta,\delta].
+\]
+Since \(\mathcal{U}_2\) requires only the first two conditions (bounds on each \(\Delta_i\) and the \(\ell_1\)-budget), the same \(\Delta\) also satisfies all constraints defining \(\mathcal{U}_2\). Hence \(d\in\mathcal{U}_2\), and we have \(\mathcal{U}_1\subseteq\mathcal{U}_2\).
+
+To show the inclusion is strict, define
+\[
+\Delta^*_i := \epsilon_i^+,\qquad\forall\,i\in V,
+\]
+and let \(d^*\) be given by \(d^*_i=\bar d_i+\Delta^*_i\). Clearly \(\Delta^*_i\in[-\epsilon_i^-,\epsilon_i^+]\) for every \(i\). Moreover, by the assumption \(\Gamma\ge\sum_{i\in V}\epsilon_i^+\),
+\[
+\sum_{i\in V}|\Delta^*_i|
+= \sum_{i\in V}\epsilon_i^+\le\Gamma,
+\]
+so \(d^*\in\mathcal{U}_2\). However,
+\[
+\sum_{i\in V}\Delta^*_i
+=\sum_{i\in V}\epsilon_i^+>\delta,
+\]
+by the assumption \(0\le\delta<\sum_{i\in V}\epsilon_i^+\). Therefore \(\Delta^*\) does \emph{not} satisfy \(\sum_{i\in V}\Delta_i\in[-\delta,\delta]\), which implies \(d^*\notin\mathcal{U}_1\). Consequently \(\mathcal{U}_1\subsetneq\mathcal{U}_2\).
+\end{proof}
+
+
+\section{Derivation of the C \& CG Algorithm}\label{ap2}
+
+To solve the dual form of the second-stage subproblem, we first construct the Lagrangian function.
+
+\begin{equation*}
+\begin{aligned}
+\mathcal{L}(y,s,L;\pi,\alpha,\beta,\gamma,\mu) =  &\sum_{i\in V} \Bigl( \lambda^+ s_i^+ + \lambda^- s_i^- \Bigr) \\
+& +\sum_{i\in V} \pi_i \Bigl( d_i - \sum_{k\in K} y_i^k - s_i^+ + s_i^- \Bigr)\\
+& + \sum_{k\in K}\sum_{(i,j):\, x_{ij}^k=1} \eta_{ij}^k \Bigl( L_j^k - L_i^k + y_i^k \Bigr) \\
+& - \sum_{k\in K}\sum_{i\in V} \alpha_i^k \, L_i^k \\
+& + \sum_{k\in K}\sum_{i\in V} \beta_i^k \Bigl( L_i^k - Q \Bigr) \\
+& - \sum_{k\in K}\sum_{i\in V} \gamma_i^{k,-} \Bigl( y_i^k + Q\sum_{j\in V} x_{ji}^k \Bigr) \\
+& + \sum_{k\in K}\sum_{i\in V} \gamma_i^{k,+} \Bigl( y_i^k - Q\sum_{j\in V} x_{ji}^k \Bigr) \\
+& + \sum_{k\in K} \mu^k\, L_0^k \,.
+\end{aligned}
+\end{equation*}
+For variables \( s_i^+ \) and \( s_i^- \):
+\begin{equation*}
+\sum_{i\in V}\lambda^+ s_i^+ - \pi_i s_i^+ = \sum_{i\in V}(\lambda^+ - \pi_i) s_i^+.
+\end{equation*}
+\begin{equation*}
+\sum_{i\in V}\lambda^- s_i^- + \pi_i s_i^- = \sum_{i\in V}(\lambda^- - \pi_i) s_i^-.
+\end{equation*}
+To ensure that the minimal lower bound for  $s_i^+$ and $s_i^-$ is not $-\infty$, the following must hold:
+\begin{equation*}
+    \begin{cases}
+    \lambda^+ - \pi_i \geq 0 , \\
+    \lambda^- + \pi_i \geq 0 ,
+\end{cases} \quad \Rightarrow \quad -\lambda^- \leq \pi_i \leq \lambda^+, \quad \forall\, i \in N.
+\end{equation*}
+By organizing the relevant terms involving the variable $y_i^k$ in the Lagrangian function, we obtain
+\begin{equation*}
+\sum_{k\in K}\sum_{i\in V}y_i^k \Bigl( \sum_{j: x_{ij}^k=1} \eta_{ij}^k - \pi_i - \gamma_i^{k,-} + \gamma_i^{k,+} \Bigr).
+\end{equation*}
+To ensure a finite lower bound for the minimization of \( y_i^k \), the corresponding coefficients must be zero, yielding one of the dual constraints:
+\begin{equation*}
+\sum_{j: x_{ij}^k=1} \eta_{ij}^k - \pi_i - \gamma_i^{k,-} + \gamma_i^{k,+} = 0,\quad \forall\, i\in V,\; \forall\, k\in K.
+\end{equation*}
+
+When variable $L_i^k$ appears in the constraint $L_j^k = L_i^k - y_i^k$, two cases arise: For $i$ as a “preceding node” (outflow), the coefficient is $-\eta_{ij}^k$; for $i$ as a “following node” (inflow), the coefficient is $+\eta_{ji}^k$. Combine this with the truk capacity lower and upper bounds in the Lagrange terms \(+\alpha_i^k\, L_i^k - \beta_i^k\, L_i^k\) and the term \(\mu_k L_0^k\) when \(i=0\). Since the origin node \(i=0\) has no inflow, the dual constraints are considered in two cases. For each $i\in V$ and $k\in K$, the coefficient for $ L_i^k$ must be zero:
+\begin{enumerate}[label= (\arabic*)]
+  \item For $i = 0$ (depot):
+    \begin{equation*}
+        \mu^k - \sum_{j: x_{0j}^k=1} \eta_{0j}^k - \alpha_0^k + \beta_0^k  = 0.
+    \end{equation*}
+  \item For $i \neq 0$:
+    \begin{equation*}
+        \sum_{j: x_{ij}^k=1} \eta_{ij}^k - \sum_{j: x_{ji}^k=1} \eta_{ji}^k + \alpha_i^k - \beta_i^k = 0.
+    \end{equation*}
+\end{enumerate}
+
+For other constraints not involving $d_i$, after applying lower or upper bound operations, their contributions form the “constant term” of the dual objective.  The Lagrange multiplier corresponding to the upper truck limit $L_i^k \le Q$ is $-\beta_i^k (L_i^k - Q)$. Maximizing this contribution is equivalent to introducing the term $-\beta_i^k Q$ in the dual objective function. Similarly, the access constraint inequalities have Lagrange multipliers $-\gamma_i^{k,-} \bigl(y_i^k + Q\sum_{j} x_{ji}^k\bigr)$ and $\gamma_i^{k,+} \bigl( y_i^k - Q\sum_ {j} x_{ji}^k \bigr)$ for each $y_i^k$.
+
+By isolating the parts of the Lagrange function independent of the decision variables, the dual objective function is obtained as:
+\begin{equation*}
+\sum_{i\in V} \pi_i d_i - \sum_{k\in K}\sum_{i\in V} \beta_i^k Q - \sum_{k\in K}\sum_{i\in V} \left(\gamma_i^{k,-} + \gamma_i^{k,+}\right) Q \sum_{j\in V} x_{ji}^k.
+\end{equation*}
+
+Therefore, the dual problem of the second-stage problem is equivalent to
+\begin{align*}
+\max_{\pi,\eta,\alpha,\beta,\gamma,\mu} & \sum_{i\in V} \pi_i\, d_i - \sum_{k\in K}\sum_{i\in V} \beta_i^k\, Q - \sum_{k\in K}\sum_{i\in V} \left(\gamma_i^{k,-} + \gamma_i^{k,+}\right) Q \sum_{j\in V} x_{ji}^k \\
+\text{s.t.} & -\lambda^- \le \pi_i \le \lambda^+, \forall\, i\in V, \\ 
+& \sum_{j: x_{ij}^k=1} \eta_{ij}^k - \pi_i - \gamma_i^{k,-} + \gamma_i^{k,+} = 0, \forall\, i\in V,\; \forall\, k\in K, \\
+& \sum_{j: x_{0j}^k=1} -\eta_{0j}^k + \alpha_0^k - \beta_0^k + \mu^k = 0,\forall\, k\in K, \\
+& \sum_{j: x_{ij}^k=1} \eta_{ij}^k - \sum_{j: x_{ji}^k=1} \eta_{ji}^k + \alpha_i^k - \beta_i^k = 0, \forall\, i\neq 0,\; \forall\, k\in K, \\ 
+& \alpha_i^k,\, \beta_i^k,\, \gamma_i^{k,-},\, \gamma_i^{k,+} \ge 0, \forall\, i\in V,\; \forall\, k\in K.
+\end{align*}
+
+For convenience of notation, we express the second-stage problem as
+\begin{equation*}
+    Q(x,d) = \max_{(\pi\in\Pi(x)) \in \mathcal{D}(x)} \left\{ \sum_{i\in V} \pi_i\, d_i - \Psi(x,\pi) \right\},
+\end{equation*} where
+\begin{equation*}
+\Psi(x,\pi) = \min \Biggl\{ \sum_{k\in K}\sum_{i\in V} \beta_i^k\, Q + \sum_{k\in K}\sum_{i\in V} \left(\gamma_i^{k,-}+\gamma_i^{k,+}\right) Q \sum_{j\in V} x_{ji}^k , s.t. ~\text{(25)- (29)} \Biggr\},
+\end{equation*}
+where $\Pi(x) $ denotes the constraints generated by converting the primal problem into the dual problem, and the dual feasible region $\Pi(x)$ includes the constraint:
+\begin{equation*}
+-\lambda^- \le \pi_i \le \lambda^+, \quad \forall\, i\in V.
+\end{equation*}
+Additionally, we express uncertain demand as \( d_i=\bar{d}_i+\Delta_i \), yielding
+\begin{equation*}
+Q(x,\Delta)=\max_{\pi\in \Pi(x)} \left\{ \sum_{i\in V} \pi_i\, \bar{d}_i - \Psi(x,\pi) + \sum_{i\in V}\pi_i\,\Delta_i \right\}.
+\end{equation*}
+Extracting the uncertainty component and defining
+\begin{equation*}
+\sigma(\pi)=\max_{\Delta\in \mathcal{U}} \sum_{i\in V}\pi_i\,\Delta_i,
+\end{equation*} we obtain
+
+\begin{equation*}
+Q(x,\Delta)=\max_{\pi\in \Pi(x)} \left\{ \sum_{i\in V} \pi_i\, \bar{d}_i - \Psi(x,\pi) + \sigma(\pi) \right\}.
+\end{equation*}
+
+\bibliographystyle{elsarticle-harv} 
+\bibliography{references}
+
+
+\end{document}
+
+\endinput
+
+
+
