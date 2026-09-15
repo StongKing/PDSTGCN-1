@@ -1,0 +1,41 @@
+{
+  "source_version": "V7_10min_from_V6_4",
+  "signal_shape": [
+    4465,
+    568,
+    3
+  ],
+  "real_station_count": 567,
+  "model_node_count": 568,
+  "mesoscopic_node_index": 0,
+  "fleet_size": 5310,
+  "state_boundary_count": 4465,
+  "interval_count": 4464,
+  "sampling_minutes": 10,
+  "points_per_hour": 6,
+  "input_steps": 6,
+  "prediction_steps": 6,
+  "alignment_trim": 11,
+  "sample_count": 4454,
+  "split_counts": {
+    "train": 2672,
+    "val": 891,
+    "test": 891
+  },
+  "dynamic_graph_semantics": {
+    "window": "same historical hour as model input",
+    "station_to_0": "V7 user departures",
+    "0_to_station": "V7 user arrivals",
+    "station_to_station": "V7 inferred operator relocation OD",
+    "storage": "packed sparse per-sample directed weighted graph"
+  },
+  "static_graph_semantics": "training-period support only, undirected; physical support plus training user OD",
+  "paths": {
+    "signal": "D:\\physic_predict_bike\\data\\DIVVY\\DIVVY.npz",
+    "dynamic": "D:\\physic_predict_bike\\data\\DIVVY\\dynamic_graph_sparse.npz",
+    "static_edges": "D:\\physic_predict_bike\\data\\DIVVY\\DIVVY.csv",
+    "node_mapping": "D:\\physic_predict_bike\\data\\DIVVY\\node_mapping.csv",
+    "sample_index": "D:\\physic_predict_bike\\data\\DIVVY\\sample_index.csv",
+    "config": "D:\\physic_predict_bike\\configurations\\DIVVY_astgcn.conf"
+  }
+}
