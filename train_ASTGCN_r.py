@@ -17,7 +17,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from lib.metrics import masked_mae, masked_mse, pdstgcn_loss
+from lib.metrics import masked_mae, masked_mse, pdstgcn_loss, forecasting_loss
 from lib.utils import (
     get_adjacency_matrix,
     load_graphdata_channel1,
@@ -57,13 +57,20 @@ PREDICT_EPOCH = None
 # Configuration file
 CONFIG_PATH = "configurations/DIVVY_astgcn.conf"
 
+RECONCILIATION_SCALE_PATH = (
+    Path(__file__).resolve().parent
+    / "experiments"
+    / "DIVVY"
+    / "offline_reconciliation"
+    / "validation_error_scale.npy"
+)
 
 # Physics-loss coefficients
 #
 # IMPORTANT:
 # Training and validation use exactly the same coefficients.
 #
-LOSS_ALPHA = 0.005
+LOSS_ALPHA = 0.1
 LOSS_BETA = 0.01
 
 
@@ -84,7 +91,6 @@ def set_seed(seed: int):
 # ============================================================
 # Validation loss
 # ============================================================
-
 def compute_validation_loss(
     net,
     val_loader,
@@ -169,11 +175,10 @@ def compute_validation_loss(
             # ------------------------------------------------
             # Same loss as training
             # ------------------------------------------------
-            loss = pdstgcn_loss(
+            # loss = pdstgcn_loss(outputs,labels,alpha=alpha,beta=beta)
+            loss = forecasting_loss(
                 outputs,
-                labels,
-                alpha=alpha,
-                beta=beta
+                labels
             )
 
             losses.append(float(loss.item()))
@@ -394,11 +399,8 @@ def main(
             f"Invalid configuration file:\n"
             f"{config_path}"
         )
-
     data_config = config["Data"]
     training_config = config["Training"]
-
-
     # ========================================================
     # Data settings
     # ========================================================
@@ -632,6 +634,72 @@ def main(
         id_filename
     )
 
+    # ========================================================
+    # Load reconciliation error scale
+    # ========================================================
+
+    if not RECONCILIATION_SCALE_PATH.exists():
+        raise FileNotFoundError(
+            "Reconciliation error-scale file "
+            "was not found:\n"
+            f"{RECONCILIATION_SCALE_PATH}"
+        )
+
+    reconciliation_scale_np = np.load(
+        RECONCILIATION_SCALE_PATH
+    ).astype(np.float32)
+
+    expected_shape = (
+        num_of_vertices,
+        num_for_predict
+    )
+
+    if reconciliation_scale_np.shape != expected_shape:
+        raise ValueError(
+            f"reconciliation scale shape="
+            f"{reconciliation_scale_np.shape}, "
+            f"expected={expected_shape}"
+        )
+
+    # ========================================================
+    # Horizon-wise normalization
+    #
+    # IMPORTANT:
+    # Multiplying every v_i at one horizon by the same
+    # positive constant does NOT change the reconciliation
+    # solution.
+    #
+    # Therefore normalize by median station scale for better
+    # numerical conditioning.
+    # ========================================================
+
+    station_median_scale = np.median(
+        reconciliation_scale_np[1:, :],
+        axis=0,
+        keepdims=True
+    )
+
+    reconciliation_scale_np = (
+            reconciliation_scale_np
+            /
+            np.maximum(
+                station_median_scale,
+                1e-8
+            )
+    )
+
+    print(
+        "Reconciliation scale shape:",
+        reconciliation_scale_np.shape
+    )
+
+    print(
+        "Node0 / median-station scale ratio:"
+    )
+
+    print(
+        reconciliation_scale_np[0, :]
+    )
 
     # ========================================================
     # Build model
@@ -650,6 +718,7 @@ def main(
         len_input,
         num_of_vertices,
         fleet_size,
+        reconciliation_scale_np,
     )
 
 
@@ -920,11 +989,11 @@ def main(
         metric_method
     )
 
-    print(
-        "PDSTGCN loss alpha / beta:",
-        LOSS_ALPHA,
-        LOSS_BETA
-    )
+    # print(
+    #     "PDSTGCN loss alpha / beta:",
+    #     LOSS_ALPHA,
+    #     LOSS_BETA
+    # )
 
     print(
         "IMPORTANT: zero inventory is a valid observation."
@@ -1079,11 +1148,16 @@ def main(
             # PDSTGCN physics loss
             # ------------------------------------------------
 
-            loss = pdstgcn_loss(
+            # loss = pdstgcn_loss(
+            #     outputs,
+            #     labels,
+            #     alpha=LOSS_ALPHA,
+            #     beta=LOSS_BETA
+            # )
+
+            loss = forecasting_loss(
                 outputs,
-                labels,
-                alpha=LOSS_ALPHA,
-                beta=LOSS_BETA
+                labels
             )
 
 

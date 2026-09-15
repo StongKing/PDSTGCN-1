@@ -210,37 +210,246 @@ class ASTGCN_block(nn.Module):
         return x
 
 
+# class IntelligentAdjustment(nn.Module):
+#     """Current repository's learnable fleet-total correction, made configurable."""
+#
+#     def __init__(self, num_of_vertices, num_timesteps, target_sum, embedding_dim=16):
+#         super().__init__()
+#         self.target_sum = float(target_sum)
+#         self.node_embeddings = nn.Embedding(num_of_vertices, embedding_dim)
+#         self.dynamic_weight_net = nn.Sequential(
+#             nn.Linear(num_timesteps + embedding_dim, 64),
+#             nn.ReLU(),
+#             nn.Linear(64, num_timesteps),
+#             nn.Sigmoid(),
+#         )
+#         self.residual_scaling = nn.Parameter(torch.tensor(0.1))
+#
+#     def forward(self, x, apply_rounding=None):
+#         if apply_rounding is None:
+#             apply_rounding = not self.training
+#         B, N, T = x.shape
+#         residual = self.target_sum - x.sum(dim=1)                              # B,T
+#         node_features = self.node_embeddings.weight.unsqueeze(0).expand(B, -1, -1)
+#         r = residual.unsqueeze(1).expand(-1, N, -1)
+#         weights = self.dynamic_weight_net(torch.cat([r, node_features], dim=-1))
+#         x = x + self.residual_scaling * r * weights
+#         # Inventory cannot be negative.
+#         x = F.relu(x)
+#         # Keep the current project's straight-through integerization semantics.
+#         xr = torch.round(x)
+#         x = x + (xr - x).detach()
+#         return x
+
+
 class IntelligentAdjustment(nn.Module):
-    """Current repository's learnable fleet-total correction, made configurable."""
+    """
+    Error-scale-weighted hard fleet reconciliation.
 
-    def __init__(self, num_of_vertices, num_timesteps, target_sum, embedding_dim=16):
+    Training output:
+        x_i >= 0
+        sum_i x_i = target_sum
+
+    Inference output:
+        x_i is a nonnegative integer
+        sum_i x_i = target_sum
+
+    error_scale:
+        shape [N, T]
+
+        A larger value means that the corresponding node/horizon
+        is empirically less reliable and is therefore allowed to
+        absorb more of the fleet-conservation correction.
+
+    The continuous reconciliation solves
+
+        min_z  1/2 * sum_i (z_i - x_i)^2 / v_i
+
+        s.t.
+            z_i >= 0,
+            sum_i z_i = target_sum.
+    """
+
+    def __init__(
+        self,
+        num_of_vertices,
+        num_timesteps,
+        target_sum,
+        error_scale,
+        bisection_steps=60,
+        eps=1e-8,
+    ):
         super().__init__()
+
+        self.num_of_vertices = int(num_of_vertices)
+        self.num_timesteps = int(num_timesteps)
+
         self.target_sum = float(target_sum)
-        self.node_embeddings = nn.Embedding(num_of_vertices, embedding_dim)
-        self.dynamic_weight_net = nn.Sequential(
-            nn.Linear(num_timesteps + embedding_dim, 64),
-            nn.ReLU(),
-            nn.Linear(64, num_timesteps),
-            nn.Sigmoid(),
+        self.target_sum_int = int(round(target_sum))
+
+        self.bisection_steps = int(bisection_steps)
+        self.eps = float(eps)
+
+        # ----------------------------------------------------
+        # Fixed node/horizon error scale
+        # ----------------------------------------------------
+
+        scale = torch.as_tensor(
+            error_scale,
+            dtype=torch.float32
         )
-        self.residual_scaling = nn.Parameter(torch.tensor(0.1))
 
-    def forward(self, x, apply_rounding=None):
-        if apply_rounding is None:
-            apply_rounding = not self.training
+        expected_shape = (
+            self.num_of_vertices,
+            self.num_timesteps,
+        )
+
+        if tuple(scale.shape) != expected_shape:
+            raise ValueError(
+                f"error_scale shape={tuple(scale.shape)}, "
+                f"expected={expected_shape}"
+            )
+
+        if not torch.isfinite(scale).all():
+            raise ValueError(
+                "error_scale contains NaN or Inf."
+            )
+
+        scale = torch.clamp(
+            scale,
+            min=self.eps
+        )
+
+        # It is a fixed physical/statistical calibration,
+        # NOT a trainable network parameter.
+        self.register_buffer(
+            "error_scale",
+            scale
+        )
+
+
+    # ========================================================
+    # Weighted nonnegative fleet reconciliation
+    # ========================================================
+
+    def weighted_projection(self, x):
+        """
+        x:[B, N, T]
+        Solve independently for each sample and horizon:
+            min_z  1/2 sum_i (z_i-x_i)^2/v_i
+        subject to
+            z_i >= 0
+            sum_i z_i = target_sum
+        KKT form:
+            z_i = max(x_i + lambda*v_i, 0)
+        The active set is identified with detached bisection.
+        Once the active set is known, lambda is recomputed
+        from x without detach, so the projection remains
+        differentiable almost everywhere.
+        """
         B, N, T = x.shape
-        residual = self.target_sum - x.sum(dim=1)                              # B,T
-        node_features = self.node_embeddings.weight.unsqueeze(0).expand(B, -1, -1)
-        r = residual.unsqueeze(1).expand(-1, N, -1)
-        weights = self.dynamic_weight_net(torch.cat([r, node_features], dim=-1))
-        x = x + self.residual_scaling * r * weights
-        # Inventory cannot be negative.
-        x = F.relu(x)
-        # Keep the current project's straight-through integerization semantics.
-        xr = torch.round(x)
-        x = x + (xr - x).detach()
-        return x
+        if N != self.num_of_vertices:
+            raise ValueError(f"Input node count={N}, "f"expected={self.num_of_vertices}")
+        if T != self.num_timesteps:
+            raise ValueError(f"Input horizon={T}, " f"expected={self.num_timesteps}")
 
+        # [1,N,T], automatically broadcast over batch
+        v = self.error_scale.to(device=x.device,dtype=x.dtype).unsqueeze(0)
+        # ====================================================
+        # Step 1: determine the active set.
+        # This is a piecewise-constant combinatorial decision, so we do not need gradients through the bisection.
+        # ====================================================
+        with torch.no_grad():
+            xd = x.detach()
+            vd = v.detach()
+            # z_i becomes positive when lambda > -x_i / v_i
+            threshold = (-xd/ vd)
+            # Lower bound: all components essentially inactive.
+            lo = (threshold.amin(dim=1)-1.0)                               # [B,T]
+
+            # If every component were active, this would be the equality-constraint solution.
+            all_active_lambda = (self.target_sum-xd.sum(dim=1)) / (vd.sum(dim=1)+self.eps)
+            hi = torch.maximum(threshold.amax(dim=1) + 1.0, all_active_lambda + 1.0)
+            # ------------------------------------------------
+            # Bisection: F(lambda) = sum_i max(x_i + lambda*v_i,0) is monotone increasing.
+            # ------------------------------------------------
+            for _ in range(self.bisection_steps):
+                mid = (lo + hi) / 2.0
+                z_mid = torch.clamp(xd+mid.unsqueeze(1)*vd,min=0.0)
+                total_mid = z_mid.sum(dim=1)
+
+                too_small = (total_mid<self.target_sum)
+                lo = torch.where(too_small,mid,lo)
+                hi = torch.where(too_small,hi,mid)
+
+            lambda_detached = (lo + hi) / 2.0
+            active = (xd+lambda_detached.unsqueeze(1)*vd>0.0)
+
+        # ====================================================
+        # Step 2: recompute lambda WITH gradient on the fixed active set.
+        # lambda=(M - sum_{i in A} x_i)/sum_{i in A} v_i
+        # ====================================================
+        active_f = active.to(dtype=x.dtype)
+        denominator = (v*active_f).sum(dim=1).clamp_min(self.eps)
+        numerator = (self.target_sum-(x*active_f).sum(dim=1))
+        lam = (numerator/denominator)                                  # [B,T]
+        # ====================================================
+        # Step 3: exact continuous solution
+        # ====================================================
+        z = (x+lam.unsqueeze(1)*v)
+        z = torch.where(active,z,torch.zeros_like(z))
+        return z
+    # ========================================================
+    # Exact integerization
+    # ========================================================
+    @torch.no_grad()
+    def integerize_preserve_sum(self,x):
+        """
+        Largest-remainder integerization.
+        Input:
+            x >= 0
+            sum_i x_i = target_sum
+        Output:
+            integer x_i >= 0
+            sum_i x_i = target_sum exactly
+        """
+        # numerical protection only
+        x = torch.clamp(x,min=0.0)
+        B, N, T = x.shape
+        x_floor = torch.floor(x)
+        fraction = (x-x_floor)
+        result = x_floor.clone()
+        remaining = (self.target_sum_int-x_floor.sum(dim=1).long())                                  # [B,T]
+        for b in range(B):
+            for t in range(T):
+                k = int(remaining[b, t].item())
+                if k < 0:
+                    raise RuntimeError("Integerization produced ""negative remaining fleet.")
+                if k > N:
+                    raise RuntimeError(f"remaining={k} > N={N}")
+                if k == 0:
+                    continue
+                idx = torch.topk(fraction[b, :, t],k=k,largest=True,sorted=False).indices
+                result[b,idx,t] += 1.0
+        return result
+
+    # ========================================================
+    # Forward
+    # ========================================================
+
+    def forward(self,x,apply_rounding=None):
+        if apply_rounding is None:
+            apply_rounding = (not self.training)
+        # ----------------------------------------------------
+        # Continuous hard reconciliation
+        # ----------------------------------------------------
+        x = self.weighted_projection(x)
+        # ----------------------------------------------------
+        # Integerization only at inference
+        # ----------------------------------------------------
+        if apply_rounding:
+            x = self.integerize_preserve_sum(x)
+        return x
 
 class ASTGCN_submodule(nn.Module):
     def __init__(
@@ -258,6 +467,7 @@ class ASTGCN_submodule(nn.Module):
         num_of_vertices,
         L_f,
         fleet_size,
+        reconciliation_scale,
     ):
         super().__init__()
         self.BlockList = nn.ModuleList()
@@ -295,6 +505,7 @@ class ASTGCN_submodule(nn.Module):
             num_of_vertices=num_of_vertices,
             num_timesteps=num_for_predict,
             target_sum=fleet_size,
+            error_scale=reconciliation_scale,
         )
         self.register_buffer("L_f", L_f.float())
         self.DEVICE = device
@@ -333,6 +544,7 @@ def make_model(
     len_input,
     num_of_vertices,
     fleet_size,
+    reconciliation_scale,
 ):
     L_tilde = scaled_Laplacian(adj_mx)
     cheb = [torch.from_numpy(x).float().to(DEVICE) for x in cheb_polynomial(L_tilde, K)]
@@ -352,6 +564,7 @@ def make_model(
         num_of_vertices,
         L_f,
         fleet_size,
+        reconciliation_scale,
     )
 
     for p in net.parameters():

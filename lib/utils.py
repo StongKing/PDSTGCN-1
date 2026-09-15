@@ -271,8 +271,107 @@ def predict_and_save_results_mstgcn(
     print(f"{type_name} RMSE: {rmse:.6f}")
     print(f"{type_name} MAPE(nonzero only): {mape:.6f}")
 
+    # ============================================================
+    # Fleet-conservation diagnostics
+    #
+    # fleet_true / fleet_pred shape:
+    #     [num_samples, num_prediction_steps]
+    #
+    # Node 0 IS included here because fleet conservation applies to
+    # physical stations + the in-transit node.
+    # ============================================================
+
     fleet_true = target.sum(axis=1)
     fleet_pred = pred.sum(axis=1)
-    print(f"{type_name} max |fleet error|: {np.max(np.abs(fleet_pred - fleet_true)):.6f}")
+
+    fleet_error = fleet_pred - fleet_true
+    fleet_abs_error = np.abs(fleet_error)
+
+    # Flatten all sample-horizon combinations.
+    fleet_abs_flat = fleet_abs_error.reshape(-1)
+    fleet_signed_flat = fleet_error.reshape(-1)
+
+    fleet_mean_abs = float(np.mean(fleet_abs_flat))
+    fleet_median_abs = float(np.median(fleet_abs_flat))
+    fleet_p90_abs = float(np.percentile(fleet_abs_flat, 90))
+    fleet_p95_abs = float(np.percentile(fleet_abs_flat, 95))
+    fleet_p99_abs = float(np.percentile(fleet_abs_flat, 99))
+    fleet_max_abs = float(np.max(fleet_abs_flat))
+
+    fleet_mean_signed = float(np.mean(fleet_signed_flat))
+    fleet_rmse = float(
+        np.sqrt(np.mean(fleet_signed_flat ** 2))
+    )
+
+    fleet_exact_rate = float(
+        np.mean(fleet_abs_flat < 0.5)
+    )
+
+    print("")
+    print("=" * 70)
+    print(f"{type_name.upper()} FLEET-CONSERVATION DIAGNOSTICS")
+    print("=" * 70)
+
+    print(
+        f"mean |fleet error|   : "
+        f"{fleet_mean_abs:.6f}"
+    )
+
+    print(
+        f"median |fleet error| : "
+        f"{fleet_median_abs:.6f}"
+    )
+
+    print(
+        f"P90 |fleet error|    : "
+        f"{fleet_p90_abs:.6f}"
+    )
+
+    print(
+        f"P95 |fleet error|    : "
+        f"{fleet_p95_abs:.6f}"
+    )
+
+    print(
+        f"P99 |fleet error|    : "
+        f"{fleet_p99_abs:.6f}"
+    )
+
+    print(
+        f"max |fleet error|    : "
+        f"{fleet_max_abs:.6f}"
+    )
+
+    print(
+        f"mean signed error    : "
+        f"{fleet_mean_signed:.6f}"
+    )
+
+    print(
+        f"fleet-error RMSE     : "
+        f"{fleet_rmse:.6f}"
+    )
+
+    print(
+        f"exact fleet rate     : "
+        f"{100.0 * fleet_exact_rate:.2f}%"
+    )
+
+    print("=" * 70)
     print("saved:", out)
+
+    print("")
+    print("Fleet error by prediction horizon:")
+
+    for t in range(fleet_abs_error.shape[1]):
+        e = fleet_abs_error[:, t]
+
+        print(
+            f"  horizon {t + 1}: "
+            f"mean={np.mean(e):.4f}, "
+            f"median={np.median(e):.4f}, "
+            f"P95={np.percentile(e, 95):.4f}, "
+            f"max={np.max(e):.4f}"
+        )
+
     return pred

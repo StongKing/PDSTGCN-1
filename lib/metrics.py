@@ -51,7 +51,7 @@ def rmse_np(y_true, y_pred):
     return float(np.sqrt(np.mean(d * d)))
 
 
-def pdstgcn_loss(outputs, labels, alpha=0.01, beta=0.01):
+def pdstgcn_loss(outputs, labels, alpha=1, beta=0.01):
     N = outputs.shape[1]
 
     loss_pred = torch.mean(
@@ -76,3 +76,16 @@ def pdstgcn_loss(outputs, labels, alpha=0.01, beta=0.01):
         + alpha * loss_cons
         + beta * loss_int
     )
+
+def forecasting_loss(
+    outputs,
+    labels
+):
+
+    return torch.mean(
+    torch.abs(
+        outputs[:, 1:, :]
+        -
+        labels[:, 1:, :]
+    )
+)
